@@ -1,0 +1,54 @@
+/* FUENTE  */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+/* COLORES ------------------- */
+
+.bg-verde{ background-color: #114232 ; }
+.txt-verde, .txt-verde:hover, .txt-verde:focus{ color: #114232 ; }
+
+.bg-alga{ background-color: #87A922 ; }
+.txt-alga{ color: #87A922 ; }
+
+.bg-naranja{ background-color: #FEA724 ; }
+.txt-naranja{ color: #FEA724 ; }
+
+.bg-amarillo{ background-color: #EEF152 ; }
+.txt-amarillo{ color: #EEF152 ; }
+
+.bg-crema{ background-color: #F7F6BB ; }
+.txt-crema, .txt-crema:hover, .txt-crema:focus{ color: #F7F6BB ; }
+
+.bg-gris{ background-color: #EBEBEB ; }
+.txt-gris{ color: #EBEBEB ; }
+
+.focus-ring-alga:focus {
+    border-color: #87A922 ;
+    box-shadow: 0 0 0 0.2rem rgba(135, 169, 34, 0.25) ;
+ }
+
+.btn-alga-gris,
+.btn-alga-gris:hover,
+.btn-alga-gris:active {
+     background-color: #87a922;
+     color: #ebebeb;
+     border: none;
+ }
+/* ----------------------------- */
+
+/* SCROLLBAR */
+::-webkit-scrollbar {
+    width: 12px;              
+}
+::-webkit-scrollbar-track {
+    background: #EBEBEB  ;      
+}
+::-webkit-scrollbar-thumb {
+    background-color: #114232;    
+    border-radius: 20px;       
+    border: 3px solid #EBEBEB;
+}
+
+
+h1, h2, h3, h4, h5, h6, p, a, input, label, button, textarea, select {
+    font-family: "Outfit", sans-serif !important;
+}

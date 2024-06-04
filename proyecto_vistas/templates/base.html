@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--titulo-->
+    <title>{% block title %}{% endblock title %}</title>
+
+    <!--bootstrap - css-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"/>
+   
+    <!--fontawesome-->
+    <script src="https://kit.fontawesome.com/09a6821d14.js" crossorigin="anonymous"></script>
+    
+    <!--css-->
+    <link rel="stylesheet" href="{{ url_for("static", filename= "css/styles_base.css") }}"/>
+   
+    <!--favicon-->
+    <link rel="icon" type="image/x-icon" href="{{ url_for("static", filename= "images/logo.png") }}"/>
+  </head>
+
+  <body class="{{ color_fondo }}"> <!--cambiar los colores para cada template-->
+    
+    <!-- header -->
+    <header class="navbar navbar-expand-lg bd-navbar col-12">
+      <nav class="navbar bg-trasparent col-12 p-3 pe-4 flex-wrap bd-gutter">
+          <div class="container-fluid">
+            <a class="p-3 d-flex align-items-center navbar-brand" href="#">
+              <img src="{{ url_for("static", filename= "images/logo.png") }}" alt="Logo" width="50" height="50"/>
+              <p class="m-0 ms-2 align-top fw-semibold lh-1 {{ color_letras }}">PATITAS<br />PERDIDAS</p>
+            </a>
+
+            <ul class="nav nav-underline d-flex justify-content-end">
+              <li class="nav-item">
+                <a class="nav-link {{ color_letras }}" aria-current="page" href="#">Busco</a> <!--cambiar los colores para cada template-->
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link {{ color_letras }}" href="#">Encontré</a> <!--cambiar los colores para cada template-->
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link {{ color_letras }}" href="#">Refugios</a> <!--cambiar los colores para cada template-->
+              </li>
+
+              <li class="nav-item">
+                <a class="nav-link {{ color_letras }}" href="#">Admin</a> <!--cambiar los colores para cada template-->
+              </li>
+            </ul>
+          </div>
+      </nav>
+    </header>
+
+    {% block content %}{% endblock content %}
+
+    <!-- footer -->
+    <footer class="bd-footer col-12">
+      <div class="bg-verde col-12 pt-4 p-0 pe-4 row g-0 text-center sticky-bottom">
+        <div class="container overflow-hidden text-center">
+          <div class="row gx-5">
+            <div class="col-2 ">
+              <div class="p-3 d-flex align-items-center">
+                <img src="{{ url_for("static", filename= "images/logo.png") }}" alt="Logo" width="50" height="50" class="align-text-top"/>
+                <p class="m-0 ms-2 text-start txt-crema fw-semibold lh-1 fs-5">PATITAS<br />PERDIDAS</p>
+              </div>
+            </div>
+
+            <div class="col p-3 border-start text-start">
+              <h5 class="txt-crema">Mascotas</h5>
+              <ul class="nav-underline list-unstyled">
+                <li class="mb-3">
+                  <a class="nav-link txt-crema" aria-current="page" href="#">¡Perdí mi mascota! ¿Qué hago?</a>
+                </li>
+                <li class="mb-3">
+                  <a class="nav-link txt-crema" href="#">¡Encontré una mascota! Ver mapa</a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="col p-3 text-start">
+              <h5 class="txt-crema">Refugios</h5>
+              <ul class="nav-underline list-unstyled">
+                <li class="mb-3">
+                  <a class="nav-link txt-crema" aria-current="page" href="#">Refugios de la red</a>
+                </li>
+                <li class="mb-3">
+                  <a class="nav-link txt-crema" href="#"
+                    >Soy un refugio, quiero unirme a la red</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="col p-3 text-start">
+              <h5 class="txt-crema">Contacto</h5>
+              <p class="txt-crema">patitasperdidas@gmail.com</p>
+              <p class="txt-crema">+54 11 123456788</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="fs-6 fw-light d-flex justify-content-center txt-crema">
+          ©2024 Patitas Perdidas. All rights reserved
+        </p>
+
+      </div>
+    </footer>
+
+    <!--bootstrap - javascript-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>
