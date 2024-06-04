@@ -1,14 +1,16 @@
-from flask import Flask, request, render_template, url_for, jsonify
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
-
-CONECTOR_SQL = "mysql+mysqlconnector://root@localhost/test001" # test001 tiene que cambiarse por el nombre de la BBDD que usemos
+# Por ahora, hosteamos la BBDD locaclmente, con el nombre mascotas
+CONECTOR_SQL = "mysql+mysqlconnector://root@localhost/mascotas"
 QUERY_OBTENER_CARACTERISTICAS = "SELECT * FROM caracteristicas_mascotas" # Probar seleccionando sólo las columnas que no tienen id 
 
-app = Flask(__name__)
 engine = create_engine(CONECTOR_SQL)
+
+app = Flask(__name__)
+PUERTO_API = 5001
 
 @app.route('/caracteristicas_mascotas', methods=['GET'])
 def obtener_tabla_caracteristicas():
@@ -24,5 +26,7 @@ def obtener_tabla_caracteristicas():
     except SQLAlchemyError as err:
         return jsonify(str(err.__cause__))
     
-if __name__ == "__main__":
-    app.run("127.0.0.1", port="5001", debug=True)
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=PUERTO_API)
+
+
