@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}¡Perdí a mi mascota!{% endblock title %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles_base_forms.css') }}">
+{% endblock styles %}
+
+{% set color_fondo = "bg-gris" %}
+{% set color_letras = "txt-verde" %}
+
+
+{% block content %}
+<div class="p-5 container pt-0">
+    <!-- DIV EXPLICACION -->
+    <div id="div-explicacion" class="bg-alga col-12 p-4 mb-4 rounded-3">
+        <h1 class="text-light display-5 fw-bold"> {% block titulo_formulario %}{% endblock titulo_formulario %} </h1>
+        <p class="text-light lh-sm m-0 fs-5"> {% block explicacion_formulario %} {% endblock explicacion_formulario %} <p>
+    </div>
+
+    <!-- INPUT UBICACION -->
+    <div class="row m-0 p-0 gx-3">
+        <div id="mapa" class="col-4 ps-0">
+            <div id="map" class=" rounded-3 p-4 bg-light"></div>
+        </div>
+        <div class="col-8 pe-0">
+            <div class="rounded-3 p-4 bg-light">
+                <h3 class="fw-semibold txt-verde"><i class="txt-verde me-1 fa-solid fa-location-dot"></i> ¿Dónde se
+                    perdió?</h3>
+                <label for="inputDireccion" class="form-label txt-verde fs-5">Ingrese una dirección con número o una
+                    interseccion de dos calles</label>
+                <div class="row m-0 p-0">
+                    <input id="inputDireccion" type="text" class="form-control bg-gris">
+
+                </div>
+
+
+                <div id="divBusqueda" class="d-none bg-gris mt-3 rounded-3 p-3">
+                    <p class="fs-5 m-0">Seleccione la ubicación que corresponda:</p>
+                    <p class="text-center m-0 d-none" id="spinner"><span class="spinner-border spinner-border-sm"
+                            role="status"></span></p>
+                    <div id="resultados">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-light rounded-3 p-4 mt-3">
+
+        {% block formulario %} {% endblock formulario %}
+
+        <form>
+            <input type="text" name="direccion" id="direccion" class="d-none" value="">
+            <input type="text" name="coordX" id="coordX" class="d-none" value="">
+            <input type="text" name="coordY" id="coordY" class="d-none" value="">
+        </form>
+    </div>
+
+    <!-- MODAL ERROR NORMALIZADOR -->
+    <div class="modal fade modal-lg" id="popUpError" aria-hidden="true" aria-labelledby="popUpError"
+        tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content p-3">
+                <div class="border-0 pb-0 text-end">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h1 class="modal-title text-center fs-3 txt-alga fw-bold lh-1">¡Lo sentimos! <br> Hubo un problema con el servicio de direcciones</h1>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="fs-5 fw-light text-center">Ahora mismo no es posible procesar su reporte. Intente de nuevo mas tarde</p>
+                    <i class="txt-alga me-3 fs-5 fa-solid fa-paw"></i>
+                    <i class="txt-verde fs-3 fa-regular fa-face-frown"></i>
+                    <i class="txt-alga ms-3 fs-5 fa-solid fa-paw"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/script_direcciones.js') }}"></script>
+{% endblock scripts %}

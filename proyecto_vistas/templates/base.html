@@ -14,10 +14,11 @@
     <script src="https://kit.fontawesome.com/09a6821d14.js" crossorigin="anonymous"></script>
     
     <!--css-->
-    <link rel="stylesheet" href="{{ url_for("static", filename= "css/styles_base.css") }}"/>
-   
+    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/styles_base.css') }}"/>
+    {% block styles %}{% endblock styles %}
+
     <!--favicon-->
-    <link rel="icon" type="image/x-icon" href="{{ url_for("static", filename= "images/logo.png") }}"/>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename= 'images/logo.png') }}"/>
   </head>
 
   <body class="{{ color_fondo }}"> <!--cambiar los colores para cada template-->
@@ -27,7 +28,7 @@
       <nav class="navbar bg-trasparent col-12 p-3 pe-4 flex-wrap bd-gutter">
           <div class="container-fluid">
             <a class="p-3 d-flex align-items-center navbar-brand" href="#">
-              <img src="{{ url_for("static", filename= "images/logo.png") }}" alt="Logo" width="50" height="50"/>
+              <img src="{{ url_for('static', filename= 'images/logo.png') }}" alt="Logo" width="50" height="50"/>
               <p class="m-0 ms-2 align-top fw-semibold lh-1 {{ color_letras }}">PATITAS<br />PERDIDAS</p>
             </a>
 
@@ -109,5 +110,7 @@
 
     <!--bootstrap - javascript-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    {% block scripts %}{% endblock scripts %}
+
   </body>
 </html>
