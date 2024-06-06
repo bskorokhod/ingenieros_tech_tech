@@ -1,19 +1,23 @@
-// Example starter JavaScript for disabling form submissions if there are invalid fields
+// Estructura basada en la dada por Boostrap para validar formularios
 (() => {
-    'use strict'
-  
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    const forms = document.querySelectorAll('.needs-validation')
-  
-    // Loop over them and prevent submission
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-  
-        form.classList.add('was-validated')
-      }, false)
-    })
-  })()
+  'use strict'
+
+  const formulario = document.getElementById("formulario")
+  const direccion = document.getElementById("form-direccion")
+
+  formulario.addEventListener("submit", event => {
+    if( !formulario.checkValidity() || !direccion_valida()){
+        event.preventDefault()
+        event.stopPropagation()
+    }
+
+    formulario.classList.add('was-validated')
+    direccion.classList.add('was-validated')
+  })
+
+})()
+
+
+function direccion_valida(){
+  return document.getElementById('coordx').value != "" && document.getElementById('coordy') != ""
+}

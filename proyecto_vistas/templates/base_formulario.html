@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% block title %}¡Perdí a mi mascota!{% endblock title %}
-
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_base_forms.css') }}">
 <!-- css - leaflet -->
@@ -33,9 +31,11 @@
                     perdió?</h3>
                 <label for="inputDireccion" class="form-label txt-verde fs-5">Ingrese una dirección con número o una
                     interseccion de dos calles</label>
-                <div class="row m-0 p-0">
-                    <input id="inputDireccion" type="text" class="form-control bg-gris">
-
+                <div class="row m-0 p-0 needs-validation" novalidate id="form-direccion">
+                    <input id="inputDireccion" type="text" class="form-control bg-gris" required>
+                    <div class="invalid-feedback">
+                        Campo requerido!    
+                    </div>
                 </div>
 
 
@@ -53,13 +53,8 @@
 
     <div class="bg-light rounded-3 p-4 mt-3">
 
-        {% block formulario %} {% endblock formulario %}
+        {% block formulario %} {% endblock formulario %}                        
 
-        <form>
-            <input type="text" name="direccion" id="direccion" class="d-none" value="">
-            <input type="text" name="coordX" id="coordX" class="d-none" value="">
-            <input type="text" name="coordY" id="coordY" class="d-none" value="">
-        </form>
     </div>
 
     <!-- MODAL ERROR NORMALIZADOR -->
@@ -84,13 +79,3 @@
     
 </div>
 {% endblock content %}
-
-{% block scripts %}
-<!--validacion_formulario-->
-<script src="{{ url_for('static', filename='js/validacion_formulario.js') }}"></script>
-<!--  js - leaflet -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="{{ url_for('static', filename='js/leaflet/leaflet_formularios.js') }}"></script>
-<script src="{{ url_for('static', filename='js/script_direcciones.js') }}"></script>
-{% endblock scripts %}

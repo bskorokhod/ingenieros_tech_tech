@@ -50,8 +50,8 @@ function mostrar_direcciones_obtenidas(datos) {
         span.classList.add("fw-light", "opacity-75")
         span.appendChild(textoSpan)
 
-        parrafo.setAttribute('coord_x', dato.coordenadas.x)
-        parrafo.setAttribute('coord_y', dato.coordenadas.y)
+        parrafo.dataset.coordx = dato.coordenadas.x
+        parrafo.dataset.coordy = dato.coordenadas.y
 
         parrafo.appendChild(textoParrafo)
         parrafo.appendChild(span)
@@ -76,10 +76,9 @@ function mostrar_direcciones_obtenidas(datos) {
  * A partir de una opcion de direccion elegida, obtiene su nombre, coordenada x y coordenada y 
  */
 function obtener_coordenadas_opcion_elegida(opcion) {
-    console.log(opcion)
-    let coordX = opcion.getAttribute('coord_x')
-    let coordY = opcion.getAttribute('coord_y')
-    let direccion = opcion.textContent
+    let coordX = opcion.dataset.coordx
+    let coordY = opcion.dataset.coordy
+    let direccion = opcion.textContent.split("(")[0] // obtiene solo la primera parte de la dirección, sin localidad
 
     form_coord_x.value = coordX
     form_coord_y.value = coordY
