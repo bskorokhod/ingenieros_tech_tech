@@ -32,8 +32,8 @@ def perdido():
     elif request.method == 'GET':
         response = requests.get(HOST_API + '/caracteristicas_mascotas')
         if response.status_code == 200:
-            caracteristicas_mascotas = response.json()
-            return render_template('perdido.html', caracteristicas_mascotas=caracteristicas_mascotas)
+            caracteristicas_animales = response.json()
+            return render_template('form_mascotas.html', caracteristicas_animales=caracteristicas_animales)
         else:
             return internal_server_error(response.status_code)
 
