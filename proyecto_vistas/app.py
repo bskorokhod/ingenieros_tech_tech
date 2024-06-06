@@ -4,5 +4,84 @@ import requests
 app = Flask(__name__)
 PUERTO_APP = 5000
 
+HOST_API = "http://127.0.0.1:5001"
+
+ENDPOINT_APP_ADMIN = '/admin'
+ENDPOINT_APP_LOGIN = '/login_admin'
+
+HTML_ADMIN = "admin.html"
+HTML_LOGIN = "login.html"
+
+ENDPOINT_API_REFUGIO = '/refugio'
+ENDPOINT_API_REPORTES = '/reportes_reencuentro'
+ENDPOINT_API_LOGIN = '/login_admin'
+
+@app.route(ENDPOINT_APP_LOGIN, methods=['GET'])
+def login():
+    return render_template(HTML_LOGIN)
+
+@app.route(ENDPOINT_APP_ADMIN, methods=['POST', 'PATCH', 'PUT', 'DELETE'])
+def admin_config():
+    if request.method in ('POST', 'PATCH', 'PUT', 'DELETE'):
+
+        usuario = request.form.get("usuario")
+        contraseña = request.form.get("contraseña")
+
+        response_sesion = requests.get(HOST_API + ENDPOINT_API_LOGIN, json={"user": usuario, "password": contraseña})
+
+        if response_sesion.status_code >= 500:
+            return redirect(url_for("internal_server_error"))
+
+        sesion = response_sesion.json()
+
+        if sesion:
+
+            if request.method in ('PATCH', 'PUT', 'DELETE'):
+
+                tipo = request.form.get("tipo").lower() # "refugio" / "reencuentro"
+                accion = request.form.get("accion").lower() # "aceptar" / "rechazar"
+
+                if tipo == "refugio":
+
+                    id = request.form.get("id").lower()
+
+                    if accion == "aceptar":
+                        requests.patch(HOST_API + ENDPOINT_API_REFUGIO, json={"id": id})
+
+                    elif accion == "rechazar":
+                        requests.delete(HOST_API + ENDPOINT_API_REFUGIO, json={"id": id})
+                    
+                    else:
+                        return redirect(url_for("internal_server_error"))
+
+                elif tipo == "reencuentro":
+                    
+                    if accion == "aceptar":
+                        id_mascota = request.form.get("id_mascota").lower()
+                        requests.put(HOST_API + ENDPOINT_API_REPORTES, json={"id mascota": id_mascota})
+
+                    elif accion == "rechazar":
+                        id_reporte = request.form.get("id_reporte").lower()
+                        requests.patch(HOST_API + ENDPOINT_API_REPORTES, json={"id reporte": id_reporte})
+                    
+                    else:
+                        return redirect(url_for("internal_server_error"))
+                
+                else:
+                    return redirect(url_for("internal_server_error"))
+
+            response_refugios = requests.get(HOST_API + ENDPOINT_API_REFUGIO, json={"aceptado": "false"})
+            response_reportes = requests.get(HOST_API + ENDPOINT_API_REPORTES, json={"fue_procesado": False})
+            
+            if response_refugios.status_code >= 500 or response_reportes.status_code >= 500:
+                return redirect(url_for("internal_server_error"))
+
+            refugios = response_refugios.json()
+            reportes = response_reportes.json()
+
+            return render_template(HTML_ADMIN, usuario=usuario, contraseña=contraseña, refugios=refugios, reportes=reportes)
+
+        return redirect(url_for("login"))
+
 if __name__ == '__main__':
     app.run(port=PUERTO_APP)
