@@ -1,0 +1,129 @@
+{% extends "base_formulario.html" %}
+
+{% block title %}Formulario Mascotas{% endblock title %}
+
+{% block titulo_formulario %}¡Perdí mi mascota! ¿Qué hago?{% endblock titulo_formulario %}
+
+{% block explicacion_formulario %}
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta alias fugiat sit sunt vitae reiciendis voluptas, numquam officia, enim autem earum quas aperiam, nobis aliquid asperiores ratione. Saepe!
+{% endblock explicacion_formulario %}
+
+{% block formulario %}
+    <div class="txt-verde">
+      <h3 class="fw-semibold"><i class="fa-solid fa-circle-info"></i> Datos sobre tus mascota</h3>
+
+        <form class="row g-3 needs-validation" novalidate>
+          <input type="text" name="direccion" id="direccion" class="d-none" value="">
+            <input type="text" name="coordx" id="coordx" class="d-none" value="">
+            <input type="text" name="coordy" id="coordy" class="d-none" value="">
+
+            <div class="col-md-4">
+              <label for="inputNombre" class="form-label">Nombre de la mascota</label>
+              <input name="nombre_mascota" id="inputNombre" type="text" class="form-control bg-gris focus-ring-alga" required>
+              <div class="invalid-feedback">
+                Campo requerido!
+              </div>
+            </div>
+
+            <div class="col-md-4">
+                <label for="inputSexo" class="form-label">Sexo</label>
+                <select name="sexo" id="inputSexo" class="form-select bg-gris focus-ring-alga" required>
+                  <option selected></option>
+                  <option>Macho</option>
+                  <option>Hembra</option>
+                </select>
+                <div class="invalid-feedback">
+                  Campo requerido!
+                </div>
+              </div>
+
+            <div class="col-md-4">
+                <label for="inputEdad" class="form-label">Edad</label>
+                <select name="edad" id="inputEdad" class="form-select bg-gris focus-ring-alga" required>
+                  <option selected></option>
+                  <option>Cachorro</option>
+                  <option>Joven</option>
+                  <option>Adulto</option>
+                </select>
+                <div class="invalid-feedback">
+                  Campo requerido!
+                </div>
+              </div>
+
+            <div class="col-md-4">
+                <label for="inputTipoAnimal" class="form-label">Tipo de animal</label>
+                <select name="animal" id="inputTipoAnimal" class="form-select bg-gris focus-ring-alga" required>
+                  <option selected></option>
+                  <option>Perro</option>
+                  <option>Gato</option>
+                </select>
+                <div class="invalid-feedback">
+                  Campo requerido!
+                </div>
+              </div>
+
+            <div class="col-md-4">
+                <label for="razaMascota" class="form-label">Raza</label>
+                <select name="raza" id="razaMascota" class="form-select bg-gris focus-ring-alga" required>
+                  <option selected></option>
+                <!--agregar el for de jinja para obtener todos los valores para la raza-->
+                  <option tipoMascota="{{ tipo }}" value="{{ raza }}">{{ raza }}</option>
+                </select>
+                <div class="invalid-feedback">
+                  Campo requerido!
+                </div>
+              </div>
+
+            <div class="col-md-4">
+              <label for="colorPrincipalMascota" class="form-label">Color principal</label>
+              <select name="color" id="colorPrincipalMascota" class="form-select bg-gris focus-ring-alga" required>
+                <option selected></option>
+                  <!--agregar el for de jinja para obtener todos los valores para color-->
+                <option tipoMascota="{{ tipo }}" value="{{ raza }}">{{ color }}</option>
+              </select>
+              <div class="invalid-feedback">
+                Campo requerido!
+              </div>
+            </div>
+
+            <div class="col-md-3 mb-3 ">
+                <label for="inputFechaExtravio" class="form-label">Fecha de extravío</label>
+                <input name="fecha_extravio" type="date" class="form-control bg-gris focus-ring-alga" id="inputFechaExtravio" required>
+                <div class="invalid-feedback">
+                  Campo requerido!
+                </div>
+              </div>
+
+            <div class="mb-3 col-9 ">
+                <label for="FormControlTextareaComentarios" class="form-label">Comentarios adicionales</label>
+                <textarea name="info_adicional" class="form-control bg-gris focus-ring-alga" id="FormControlTextareaComentarios" rows="3"></textarea>
+              </div>  
+
+            <div class="row mb-2">
+                <label for="inputNombreContacto" class="col-sm-2 col-form-label">Nombre de contacto</label>
+                <div class="col-sm-10">
+                  <input name="nombre_contacto" class="form-control bg-gris focus-ring-alga" type="text" id="inputNombreContacto" required>
+                  <div class="invalid-feedback">
+                    Campo requerido!
+                  </div>
+                </div>
+              </div>
+
+            <div class="row mb-3">
+                <label for="inputTelefonoContacto" class="col-sm-2 col-form-label">Teléfono de contacto</label>
+                <div class="col-sm-10">
+                  <input name="telefono_contacto" class="form-control bg-gris focus-ring-alga" type="tel" id="inputTelefonoContacto" required>
+                  <div class="invalid-feedback">
+                    Campo requerido!
+                  </div>
+                </div>
+              </div>
+              
+            <div class="col-12">
+              <button type="submit" class="btn txt-crema bg-alga fw-medium btn-alga-gris">Enviar datos</button>
+            </div>
+
+          </form>    
+     </div>
+
+{% endblock formulario %}
