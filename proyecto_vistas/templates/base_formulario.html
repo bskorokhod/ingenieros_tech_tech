@@ -4,6 +4,10 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_base_forms.css') }}">
+<!-- css - leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}">
 {% endblock styles %}
 
 {% set color_fondo = "bg-gris" %}
@@ -82,5 +86,9 @@
 {% endblock content %}
 
 {% block scripts %}
+<!--  js - leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/leaflet/leaflet_formularios.js') }}"></script>
 <script src="{{ url_for('static', filename='js/script_direcciones.js') }}"></script>
 {% endblock scripts %}
