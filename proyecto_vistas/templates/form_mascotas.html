@@ -10,7 +10,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta
     <div class="txt-verde">
       <h3 class="fw-semibold"><i class="fa-solid fa-circle-info"></i> Datos sobre tus mascota</h3>
 
-        <form class="row g-3 needs-validation" novalidate>
+        <form class="row g-3 needs-validation" novalidate action="{{ url_for('perdido') }}" method="POST">
           <input type="text" name="direccion" id="direccion" class="d-none" value="">
             <input type="text" name="coordx" id="coordx" class="d-none" value="">
             <input type="text" name="coordy" id="coordy" class="d-none" value="">
