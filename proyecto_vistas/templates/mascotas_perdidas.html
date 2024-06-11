@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Mascotas perdidas{% endblock title %}
+
+{% block styles %} 
+<link href="{{ url_for('static', filename='css/styles_mascotas_perdidas.css') }}" rel="stylesheet">
+{% endblock styles %}
+
+{% set color_fondo = "bg-gris" %}
+{% set color_letras = "txt-verde" %}
+
+
+{% block content %}
+<div class="p-5 pt-0 align-self-center container">
+    <!-- DIV EXPLICACION -->
+    <div id="div-explicacion" class="bg-alga col-12 p-4 mb-4 rounded-3">
+        <h1 class="text-light display-5 fw-bold">¿Encontraste una mascota?</h1>
+        <p class="text-light lh-sm m-0 fs-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vulputate
+            feugiat felis et eleifend. Duis dignissim tellus a justo venenatis rhoncus et vitae tortor. Integer a rutrum
+            eros. Praesent turpis nulla, pretium et pulvinar at, vulputate et nunc. Integer velit ligula, euismod eget
+            ipsum eget, pharetra suscipit lorem. Quisque pretium gravida purus, sit amet sagittis nisl.</p>
+    </div>
+
+    <!-- DIV PRINCIPAL -->
+    <div id="div-main" class="d-flex row m-0 mb-4 gx-5 conr">
+
+        <!-- FILTROS  -->
+        <div id="filtros" class="col-3 bg-verde rounded-3 p-4 align-self-start">
+            <h2 class="text-light fw-semibold">Filtros</h2>
+
+            <form action="{{ url_for('encontrado') }}" method="POST">
+                <label for="tipoMascota" class="form-label text-light fs-5">Tipo de animal</label>
+                <select id="tipoMascota" name="animal" class="form-select mb-4">
+                    <option value="" selected></option>
+                    <option value="perro">Perro</option>
+                    <option value="gato">Gato</option>
+                </select>
+                
+                
+                <label for="razaMascota" class="form-label text-light fs-5">Raza</label>
+                <select id="razaMascota" name="raza" class="form-select mb-4" disabled>
+                    <option value="" selected></option>
+                    {% for tipo, caracteristica in caracteristicas_animales.items() %}
+                        {% for raza in caracteristica['raza'] %}
+                    <option data-tipo-mascota="{{ tipo }}" value="{{ raza }}">{{ raza }}</option>
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+                
+
+                <label for="colorPrincipalMascota" class="form-label text-light fs-5">Color principal</label>
+                <select id="colorPrincipalMascota" name="color" class="form-select mb-4" disabled>
+                    <option value="" selected></option>
+                    {% for tipo, caracteristica in caracteristicas_animales.items() %}
+                        {% for color in caracteristica['color'] %}
+                    <option data-tipo-mascota="{{ tipo }}" value="{{ color }}">{{ color }}</option>
+                        {% endfor %}
+                    {% endfor %}
+                </select>
+
+                <label for="sexoMascota" class="form-label text-light fs-5">Sexo</label>
+                <select id="sexoMascota" name="sexo" class="form-select mb-4">
+                    <option value="" selected></option>
+                    <option value="hembra">Hembra</option>
+                    <option valuea="macho">Macho</option>
+                </select>
+
+                <label for="edadMascota" class="form-label text-light fs-5">Edad</label>
+                <select id="edadMascota" name="edad" class="form-select mb-4">
+                    <option value="" selected></option>
+                    <option value="joven">Joven</option>
+                    <option value="adulto">Adulto</option>
+                    <option value="geronte">Geronte</option>
+                </select>
+
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-light bg-gris text-gris fw-medium fs-5">Filtrar</button>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- TARJETAS Y MAPA  -->
+        <div id="datos" class="col-9 pe-0">
+            <div id="map" class="rounded-3 bg-light mb-3"></div>
+
+            <div id="mascotas" class="m-0 p-0">
+                <h2 class="text-verde display-5 fw-bold mb-3">Mascotas perdidas</h2>
+
+                <!-- TARJETAS MASCOTAS -->
+                <div id="cardsMascotas" class="row row-cols-3 mx-0 px-0 g-3">
+
+                    {% for mascota in mascotas_perdidas %}
+
+                    {% if mascota['animal'] == 'perro' %}
+                        {% set dir_svg = "M269.4 2.9C265.2 1 260.7 0 256 0s-9.2 1-13.4 2.9L54.3 82.8c-22 9.3-38.4 31-38.3 57.2c.5 99.2 41.3 280.7 213.6 363.2c16.7 8 36.1 8 52.8 0C454.7 420.7 495.5 239.2 496 140c.1-26.2-16.3-47.9-38.3-57.2L269.4 2.9zM160.9 286.2c4.8 1.2 9.9 1.8 15.1 1.8c35.3 0 64-28.7 64-64V160h44.2c12.1 0 23.2 6.8 28.6 17.7L320 192h64c8.8 0 16 7.2 16 16v32c0 44.2-35.8 80-80 80H272v50.7c0 7.3-5.9 13.3-13.3 13.3c-1.8 0-3.6-.4-5.2-1.1l-98.7-42.3c-6.6-2.8-10.8-9.3-10.8-16.4c0-2.8 .6-5.5 1.9-8l15-30zM160 160h40 8v32 32c0 17.7-14.3 32-32 32s-32-14.3-32-32V176c0-8.8 7.2-16 16-16zm128 48a16 16 0 1 0 -32 0 16 16 0 1 0 32 0z" %}
+    
+                    {% else %}
+                        {% set dir_svg = "M269.4 2.9C265.2 1 260.7 0 256 0s-9.2 1-13.4 2.9L54.3 82.8c-22 9.3-38.4 31-38.3 57.2c.5 99.2 41.3 280.7 213.6 363.2c16.7 8 36.1 8 52.8 0C454.7 420.7 495.5 239.2 496 140c.1-26.2-16.3-47.9-38.3-57.2L269.4 2.9zM160 154.4c0-5.8 4.7-10.4 10.4-10.4h.2c3.4 0 6.5 1.6 8.5 4.3l40 53.3c3 4 7.8 6.4 12.8 6.4h48c5 0 9.8-2.4 12.8-6.4l40-53.3c2-2.7 5.2-4.3 8.5-4.3h.2c5.8 0 10.4 4.7 10.4 10.4V272c0 53-43 96-96 96s-96-43-96-96V154.4zM216 288a16 16 0 1 0 0-32 16 16 0 1 0 0 32zm96-16a16 16 0 1 0 -32 0 16 16 0 1 0 32 0z" %}
+                    
+                    {% endif %}
+
+                    <!-- TARJETA MASCOTA {{ mascota['id'] }} -->
+                    <div class="col-4" data-coordx="{{ mascota['coordx'] }}" data-coordy="{{ mascota['coordy'] }}">
+                        <div class="bg-alga d-flex p-4 m-0 rounded-4">
+                            <div class="col-8 m-0 p-0 pe-2">
+                                <h3 class="text-light fs-2 fw-medium m-0 lh-sm">{{ mascota['nombre'] }}</h3>
+                                <p class="fs-4 fw-light lh-1">{{ mascota['raza'] }}</p>
+                                <button name="btnVerMas" data-bs-toggle="modal" data-bs-target="#modalMascota{{ mascota['id'] }}"
+                                    id="verMas{{ mascota['id'] }}" class="btn col-12 bg-gris rounded-pill p-2 align-self-end">Ver más</button>
+                            </div>
+                            <svg class="col-4 align-self-end m-0 p-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                <path fill="#114232" d="{{ dir_svg }}" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- MODAL MASCOTA {{ mascota['id'] }}-->
+                    <div class="modal fade modalMascota modal-lg" tabindex="-1" id="modalMascota{{ mascota['id'] }}">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header border-0 px-4 pb-2">
+                                    <h3 class="modal-title fw-semibold">{{ mascota['nombre'] }}</h3>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body pt-0 p-4">
+                                    <div class="d-flex flex-row">
+                                        <!-- info principal -->
+                                        <div class="bg-crema col-5 p-4 me-2 rounded-3 h-auto">
+                                            <h4 class="fw-medium">Información</h4>
+                                            <p class="fs-5 mb-1">Animal: {{ mascota['animal'] }}</p>
+                                            <p class="fs-5 mb-1">Raza: {{ mascota['raza'] }}</p>
+                                            <p class="fs-5 mb-1">Color: {{ mascota['color']}}</p>
+                                            <p class="fs-5 mb-1">Sexo: {{ mascota['sexo'] }}</p>
+                                            <p class="fs-5 mb-1">Edad: {{ mascota['edad'] }}</p>
+                                            <p class="fs-5 m-0">Fecha de extravío: {{ mascota['fecha_extravio'] }}</p>
+                                        </div>
+
+                                        <div class="flex flex-column">
+                                            <!-- info adicional -->
+                                            <div class="bg-gris rounded-3 p-4 mb-2">
+                                                <h5 class="fw-medium">Información adicional</h5>
+                                                <p class="mb-1">{{ mascota['info_adicional'] }}</p>
+
+                                            </div>
+
+                                            
+                                            <div class="d-flex flex-row">
+                                                <!-- contacto -->
+                                                <div class="bg-alga col-7 p-4 rounded-3">
+                                                    <h4 class="fw-medium text-light">Contacto</h4>
+                                                    <p class="mb-1 fs-5 text-light">Dueño: {{ mascota['nombre_contacto'] }}</p>
+                                                    <p class="m-0 fs-5 text-light">Tel: {{ mascota.telefono_contacto }}</p>
+                                                </div>
+                                                
+                                                <!-- boton y logo  -->
+                                                <div class="col-5 d-flex flex-column justify-content-center align-items-center"> 
+                                                    <svg class="mb-2 mt-1 p-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                        <path fill="#114232" d="{{ dir_svg }}" />
+                                                    </svg>
+
+                                                    <form action="{{ url_for('aceptado', formulario='reencuentro') }}" method="POST">
+                                                        <input name="id" value="{{ mascota['id'] }}" class="d-none">
+                                                        <button type="submit" class="btn btn-success border-0 rounded-3 ms-2 bg-verde text-light fw-medium fs-5">¡Volvió a casa!</button>
+                                                    </form>
+                                                    
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- BOTON REFUGIOS -->
+    <div class="bg-verde p-4 rounded-3 d-flex flex-row justify-content-evenly align-items-center">
+        <p class="text-light fs-3 fw-bold m-0">La mascota que encontré no está acá</p>
+        <a href="{{ url_for('refugios') }}" class="btn bg-amarillo btn-warning border-0 rounded-pill w-auto px-5 fs-5 m-0"> Ver refugios </a>
+    </div>
+
+
+</div>
+
+
+    
+{% endblock content %}
+    
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/script_filtrar_caract.js') }}"></script>
+{% endblock scripts %}
