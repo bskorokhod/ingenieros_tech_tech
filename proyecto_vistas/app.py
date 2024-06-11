@@ -27,7 +27,7 @@ def perdido():
         if response.status_code == 201:
             return redirect(url_for('formulario_aceptado')) # Función que renderiza un template de formulario aceptado
         else:
-            return internal_server_error(response.status_code) # Función que renderiza un template de error 500
+            return redirect(url_for('internal_server_error', e=response.status_code)) # Función que renderiza un template de error 500
 
     elif request.method == 'GET':
         response = requests.get(HOST_API + '/caracteristicas_mascotas')
@@ -35,7 +35,7 @@ def perdido():
             caracteristicas_animales = response.json()
             return render_template('form_mascotas.html', caracteristicas_animales=caracteristicas_animales)
         else:
-            return internal_server_error(response.status_code)
+            return redirect(url_for('internal_server_error', e=response.status_code))
 
 if __name__ == '__main__':
     app.run(port=PUERTO_APP)
