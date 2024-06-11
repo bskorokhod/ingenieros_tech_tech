@@ -25,7 +25,7 @@ def perdido():
         # Los campos sin completar se envían como cadenas vacías
         response = requests.post(HOST_API + '/mascotas_perdidas', json=datos_mascota_perdida) # HOST_API es una variable global
         if response.status_code == 201:
-            return redirect(url_for('formulario_aceptado')) # Función que renderiza un template de formulario aceptado
+            return redirect(url_for("aceptado", formulario="mascota"))
         else:
             return redirect(url_for('internal_server_error', e=response.status_code)) # Función que renderiza un template de error 500
 
