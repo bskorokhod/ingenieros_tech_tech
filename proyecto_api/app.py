@@ -26,6 +26,32 @@ def obtener_tabla_caracteristicas():
     except SQLAlchemyError as err:
         return jsonify(str(err.__cause__))
     
+    
+@app.route('/login_admin',  methods = ['GET'])
+def login_admin():
+    
+    try:
+        with engine.connect() as conn:
+            
+            try: 
+                data = request.get_json(force=True)
+            except:
+                return jsonify({'code': 0})
+            
+        
+            user = data.get('user')
+            password = data.get('password')
+
+            response = conn.execute(text(f"SELECT * FROM admin WHERE usuario = '{user}' AND contrasena = '{password}'"))
+            
+            if response.rowcount > 0:
+                return jsonify({'code': 1})
+            return jsonify({'code': 0})
+        
+    except SQLAlchemyError as err:
+        return jsonify(str(err.__cause__))    
+    
+    
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=PUERTO_API)
 
