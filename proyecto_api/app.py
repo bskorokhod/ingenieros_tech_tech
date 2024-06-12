@@ -26,7 +26,7 @@ def obtener_tabla_caracteristicas():
     except SQLAlchemyError as err:
         return jsonify(str(err.__cause__)), 500
 
-@app.route('/mascotas_perdidas', methods=["POST"])
+@app.route('/mascotas_perdidas', methods=["GET", "POST"])
 def mascotas_perdidas():
     
     if request.method == "POST":
@@ -56,6 +56,39 @@ def mascotas_perdidas():
             return jsonify(str(err.__cause__)), 500
         
         return jsonify({'mensaje': "Los datos se agregaron correctamente"}), 201
+        
+    elif request.method == "GET":
+        
+        filtros = []
+        clausula_where = ""
+
+        # request.args.items() recibe las columnas solicitadas y sus respectivos valores en un tupla a partir de la URL
+        for columna, valor in request.args.items():
+            if valor:
+                filtros.append(f"{columna} = '{valor}'")
+                
+        if filtros:
+            clausula_where = "WHERE " + " AND ".join(filtros)
+        clausula_where += ";"
+
+        # Escribo la query y le agrego la clausula_where
+        query = """
+        SELECT id, nombre_mascota, animal, raza, sexo, color, edad, coordx, coordy, fecha_extravio, telefono_contacto, nombre_contacto, IF(info_adicional IS NOT NULL, info_adicional, "No se ingresó ninguna información adicional.") as info_adicional 
+        FROM animales_perdidos 
+        """ + clausula_where 
+        
+        mascotas_perdidas = []
+        try:
+            with engine.connect() as conexion:
+                filas_mascotas = conexion.execute(text(query))
+        except SQLAlchemyError as err:
+            return jsonify(str(err.__cause__)), 500
+
+        # .mappings() me permite generar diccionarios con las columnas y los valores de la fila correspondiente
+        for mascota in filas_mascotas.mappings():
+            mascotas_perdidas.append(dict(mascota))
+
+        return jsonify(mascotas_perdidas), 200
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=PUERTO_API)
