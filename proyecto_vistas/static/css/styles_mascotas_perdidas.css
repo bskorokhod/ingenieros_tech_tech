@@ -1,0 +1,11 @@
+#map{
+    height: 50vh;
+}
+
+button[name='btnVerMas']:hover{
+    background-color: #EEF152 !important;
+}
+
+.modal svg{
+    width: 40%;
+}
