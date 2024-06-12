@@ -40,8 +40,12 @@ def perdido():
 @app.route('/encontrado', methods=["GET", "POST"])
 def encontrado():
 
-    caracteristicas_animales = requests.get(HOST_API + '/caracteristicas_mascotas')
-
+    datos_caracteristicas = requests.get(HOST_API + '/caracteristicas_mascotas')
+    if datos_caracteristicas.status_code == 200:
+        caracteristicas_animales = datos_caracteristicas.json()
+    else:
+        return redirect(url_for('internal_server_error', e=datos_caracteristicas.status_code))
+    
     filtros_busqueda = ""
 
     # al recibir un POST se agregan los filtros a filtros_busqueda, si se recibe GET, los filtros quedan vacíos.
