@@ -37,5 +37,27 @@ def perdido():
         else:
             return redirect(url_for('internal_server_error', e=response.status_code))
 
+@app.route('/encontrado', methods=["GET", "POST"])
+def encontrado():
+
+    caracteristicas_animales = requests.get(HOST_API + '/caracteristicas_mascotas')
+
+    filtros_busqueda = ""
+
+    # al recibir un POST se agregan los filtros a filtros_busqueda, si se recibe GET, los filtros quedan vacíos.
+    if request.method == "POST":
+
+        for clave, valor in request.form.items():
+            filtros_busqueda += f"{clave}={valor}&"
+
+    datos_mascotas = requests.get(HOST_API + '/mascotas_perdidas?' + filtros_busqueda)
+
+    if datos_mascotas.status_code == 200:
+        mascotas_perdidas = datos_mascotas.json()
+    else:
+        return redirect(url_for('internal_server_error', e=datos_mascotas.status_code))
+
+    return render_template('mascotas_perdidas.html', caracteristicas = caracteristicas_animales, mascotas = mascotas_perdidas)
+
 if __name__ == '__main__':
     app.run(port=PUERTO_APP)
