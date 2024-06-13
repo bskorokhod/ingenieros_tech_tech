@@ -8,6 +8,30 @@ PUERTO_APP = 5000
 def home():
     return render_template('home.html')
 
+@app.route('/perdido', methods=['GET', 'POST'])
+def perdido():
+    return "vista perdido"
+
+@app.route('/encontrado', methods=["GET", "POST"])
+def encontrado():
+    return "vista encontrado"
+
+@app.route("/admin", methods=['POST', 'PATCH', 'PUT', 'DELETE'])
+def admin_config():
+    return "vista admin"
+
+@app.route("/login_admin", methods=['GET'])
+def login():
+    return "vista login admin"
+
+@app.route('/agregar_refugio', methods=['GET', 'POST'])
+def agregar_refugio():
+    return "vista agregar_refugio"
+
+@app.route('/refugios', methods=['GET', 'POST'])
+def refugios():
+    return "vista refugios"
+
 @app.route("/aceptado/", defaults={"formulario": None})
 @app.route("/aceptado/<formulario>", methods=["GET", "POST"])
 def aceptado(formulario):
