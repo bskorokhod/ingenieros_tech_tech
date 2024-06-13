@@ -24,29 +24,29 @@
   <body class="d-flex flex-column vh-100 {{ color_fondo }}"> <!--cambiar los colores para cada template-->
     
     <!-- header -->
-    <header class="navbar navbar-expand-lg bd-navbar col-12">
+    <header class="navbar navbar-expand-lg bd-navbar col-12 {{ pos_absoluta|default('', true) }} p-0"> 
       <nav class="navbar bg-trasparent col-12 p-3 pe-4 flex-wrap bd-gutter">
           <div class="container-fluid">
-            <a class="p-3 d-flex align-items-center navbar-brand" href="#">
+            <a class="p-3 d-flex align-items-center navbar-brand" href="{{ url_for('home') }}">
               <img src="{{ url_for('static', filename= 'images/logo.png') }}" alt="Logo" width="50" height="50"/>
               <p class="m-0 ms-2 align-top fw-semibold lh-1 {{ color_letras }}">PATITAS<br />PERDIDAS</p>
             </a>
 
             <ul class="nav nav-underline d-flex justify-content-end">
               <li class="nav-item">
-                <a class="nav-link {{ color_letras }}" aria-current="page" href="#">Busco</a> <!--cambiar los colores para cada template-->
+                <a class="nav-link {{ color_letras }}" aria-current="page" href="{{ url_for('perdido') }}">Busco</a> <!--cambiar los colores para cada template-->
               </li>
 
               <li class="nav-item">
-                <a class="nav-link {{ color_letras }}" href="#">Encontré</a> <!--cambiar los colores para cada template-->
+                <a class="nav-link {{ color_letras }}" href="{{ url_for('encontrado') }}">Encontré</a> <!--cambiar los colores para cada template-->
               </li>
 
               <li class="nav-item">
-                <a class="nav-link {{ color_letras }}" href="#">Refugios</a> <!--cambiar los colores para cada template-->
+                <a class="nav-link {{ color_letras }}" href="{{ url_for('refugios') }}">Refugios</a> <!--cambiar los colores para cada template-->
               </li>
 
               <li class="nav-item">
-                <a class="nav-link {{ color_letras }}" href="#">Admin</a> <!--cambiar los colores para cada template-->
+                <a class="nav-link {{ color_letras }}" href="{{ url_for('login') }}">Admin</a> <!--cambiar los colores para cada template-->
               </li>
             </ul>
           </div>
@@ -72,10 +72,10 @@
               <h5 class="txt-crema">Mascotas</h5>
               <ul class="nav-underline list-unstyled">
                 <li class="mb-3">
-                  <a class="nav-link txt-crema" aria-current="page" href="#">¡Perdí mi mascota! ¿Qué hago?</a>
+                  <a class="nav-link txt-crema" aria-current="page" href="{{ url_for('perdido') }}">¡Perdí mi mascota! ¿Qué hago?</a>
                 </li>
                 <li class="mb-3">
-                  <a class="nav-link txt-crema" href="#">¡Encontré una mascota! Ver mapa</a>
+                  <a class="nav-link txt-crema" href="{{ url_for('encontrado') }}">¡Encontré una mascota! Ver mapa</a>
                 </li>
               </ul>
             </div>
@@ -84,12 +84,10 @@
               <h5 class="txt-crema">Refugios</h5>
               <ul class="nav-underline list-unstyled">
                 <li class="mb-3">
-                  <a class="nav-link txt-crema" aria-current="page" href="#">Refugios de la red</a>
+                  <a class="nav-link txt-crema" aria-current="page" href="{{ url_for('refugios') }}">Refugios de la red</a>
                 </li>
                 <li class="mb-3">
-                  <a class="nav-link txt-crema" href="#"
-                    >Soy un refugio, quiero unirme a la red</a
-                  >
+                  <a class="nav-link txt-crema" href="{{ url_for('agregar_refugio') }}">Soy un refugio, quiero unirme a la red</a>
                 </li>
               </ul>
             </div>

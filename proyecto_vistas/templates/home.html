@@ -7,9 +7,9 @@
 {% block content %}
     <div id="main" class="d-flex justify-content-start ">
         <div class="align-items-start d-flex flex-column container justify-content-end px-0" id="botonera">
-            <a class="fs-3 btn-lg btn btn-success border-0 bg-verde rounded-4 mb-4 px-5 py-3 text-center" href="#">Buscar a mi mascota</a>
-            <a class="fs-3 btn-lg btn btn-success border-0 bg-alga rounded-4 mb-4 px-5 py-3 text-center" href="#">Encontré una mascota</a>
-            <a class="fs-3 btn-lg btn btn-warning border-0 bg-naranja text-light rounded-4 mb-4 px-5 py-3 text-center" href="#">Tengo un refugio</a>
+            <a class="fs-3 btn-lg btn btn-success border-0 bg-verde rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('perdido') }}">Buscar a mi mascota</a>
+            <a class="fs-3 btn-lg btn btn-success border-0 bg-alga rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('encontrado') }}">Encontré una mascota</a>
+            <a class="fs-3 btn-lg btn btn-warning border-0 bg-naranja text-light rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('agregar_refugio') }}">Tengo un refugio</a>
         </div>
     </div>
     <div class="p-5 pb-1 bg-alga text-center">
