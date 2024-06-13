@@ -2,25 +2,12 @@ from flask import Flask, render_template, redirect, url_for, request
 import requests
 
 app = Flask(__name__)
-PUERTO_APP = 5000
 
-HOST_API = "http://127.0.0.1:5001"
-
-ENDPOINT_APP_ADMIN = '/admin'
-ENDPOINT_APP_LOGIN = '/login_admin'
-
-HTML_ADMIN = "admin.html"
-HTML_LOGIN = "login.html"
-
-ENDPOINT_API_REFUGIO = '/refugio'
-ENDPOINT_API_REPORTES = '/reportes_reencuentro'
-ENDPOINT_API_LOGIN = '/login_admin'
-
-@app.route(ENDPOINT_APP_LOGIN, methods=['GET'])
+@app.route('/login_admin', methods=['GET'])
 def login():
-    return render_template(HTML_LOGIN)
+    return render_template('login.html')
 
-@app.route(ENDPOINT_APP_ADMIN, methods=['POST', 'PATCH', 'PUT', 'DELETE'])
+@app.route('/admin', methods=['POST', 'PATCH', 'PUT', 'DELETE'])
 def admin_config():
     if request.method in ('POST', 'PATCH', 'PUT', 'DELETE'):
 
@@ -34,7 +21,10 @@ def admin_config():
 
         sesion = response_sesion.json()
 
-        if sesion:
+        if not isinstance(sesion, dict) or "code" not in sesion or not isinstance(sesion.get("code"), int) or sesion.get("code", -1) < 0 or sesion.get("code", 2) > 1:
+            return redirect(url_for("internal_server_error"))
+
+        if sesion == 1:
 
             if request.method in ('PATCH', 'PUT', 'DELETE'):
 
@@ -79,7 +69,7 @@ def admin_config():
             refugios = response_refugios.json()
             reportes = response_reportes.json()
 
-            return render_template(HTML_ADMIN, usuario=usuario, contraseña=contraseña, refugios=refugios, reportes=reportes)
+            return render_template('admin.html', usuario=usuario, contraseña=contraseña, refugios=refugios, reportes=reportes)
 
         return redirect(url_for("login"))
 
