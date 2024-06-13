@@ -3,7 +3,6 @@ import requests
 from config_app import PUERTO_APP, HOST_API, ENDPOINT_API_REFUGIO, ENDPOINT_API_REPORTES, ENDPOINT_API_LOGIN, ENDPOINT_API_CARACTERISTICAS, ENDPOINT_API_PERDIDAS
 
 app = Flask(__name__)
-PUERTO_APP = 5000
 
 @app.route('/')
 def home():
