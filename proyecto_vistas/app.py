@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 import requests
+from config_app import PUERTO_APP, HOST_API, ENDPOINT_API_REFUGIO, ENDPOINT_API_REPORTES, ENDPOINT_API_LOGIN, ENDPOINT_API_CARACTERISTICAS, ENDPOINT_API_PERDIDAS
 
 app = Flask(__name__)
 PUERTO_APP = 5000
