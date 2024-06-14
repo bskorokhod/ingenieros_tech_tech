@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %} Configuraciones Admin - Patitas Perdidas {% endblock %}
+{% set color_fondo = "bg-gris" %}
+{% set color_letras = "txt-verde" %}
+{% block content %}
+    <div class="container">
+        <div class="col-12 p-4 mb-4 bg-alga text-light rounded-3">
+            <h2><i class="fa-solid fa-magnifying-glass-location fs-1"></i> Validar reencuentro</h2>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem fugiat consequuntur, optio quam temporibus magni ipsam commodi eveniet doloribus nam praesentium culpa non id adipisci voluptas, sint molestias cumque totam.</p>
+        </div>
+        <div class="mb-5 bg-white rounded-3 text-success-emphasis">
+            {% for clave in reportes %}
+                <h3 class="ms-5 pt-3">MASCOTA #{{ reportes[clave]['id_mascota'] }}</h3>
+                <div class="d-flex justify-content-between mx-5 border-bottom border-black">
+                    <p class="fw-1 fs-5">Nombre: {{ reportes[clave]['nombre_mascota'] }}<br>
+                    Ubicación de extravío: {{ reportes[clave]['direccion'] }}<br>
+                    Fecha de extravío: {{ reportes[clave]['fecha_extravio'] }}</p>
+                    <p class="m-auto fw-1 fs-5">Nombre dueño: {{ reportes[clave]['nombre_contacto'] }}<br>
+                    Teléfono: {{ reportes[clave]['telefono_contacto'] }}</p>
+                    <div class="m-auto mx-5">
+                        <form action="{{ url_for('admin_config') }}" method="POST">
+                            <input type="text" name="usuario" id="usuario" class="d-none" value=" {{ usuario }} ">
+                            <input type="text" name="contraseña" id="contraseña" class="d-none" value=" {{ contraseña }} ">
+                            <input type="text" name="tipo" id="tipo" class="d-none" value="reencuentro">
+                            <input type="text" name="id_reporte" id="id_reporte" class="d-none" value=" {{ clave }} ">
+                            <input type="text" name="id_mascota" id="id_mascota" class="d-none" value=" {{ reportes[clave]['id_mascota'] }} ">
+                            <button class="border border-0 bg-transparent fs-1 mx-3" type="submit" name="accion" value="Aceptar"><i class="fa-solid fa-circle-check txt-alga"></i></button>
+                            <button class="border border-0 bg-transparent fs-1" type="submit" name="accion" value="Rechazar"><i class="fa-solid fa-circle-xmark txt-verde"></i></button>
+                        </form>
+                    </div>
+                </div>    
+            {% endfor %}
+        </div>
+        <div class="bg-naranja text-light col-12 p-4 mb-4 rounded-3">
+            <h2><i class="fa-solid fa-shield-heart fs-1"></i> Validar refugios</h2>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium perspiciatis nihil tempore quas, nemo, est similique suscipit voluptas officiis, sunt eligendi dignissimos. Quidem voluptas sit amet placeat fugiat inventore? Dolor.</p>
+        </div>
+        <div class="mb-5 bg-white rounded-3 text-success-emphasis">
+            {% for clave in refugios %}
+                <h3 class="mx-5 pt-3">REFUGIO #{{ clave }}</h3>
+                <div class="d-flex justify-content-between mx-5 border-bottom border-black">
+                    <p class="fw-1 fs-5">Nombre: {{ refugios[clave]['nombre'] }}<br>
+                    Ubicación: {{ refugios[clave]['direccion'] }}</p>
+                    <p class="m-auto fw-1 fs-5">Teléfono: {{ refugios[clave]['contacto'] }}</p>
+                    <div class="mb-3 mx-5">
+                        <form action="{{ url_for('admin_config') }}" method="POST">
+                            <input type="text" name="usuario" id="usuario" class="d-none" value=" {{ usuario }} ">
+                            <input type="text" name="contraseña" id="contraseña" class="d-none" value=" {{ comtraseña }} ">
+                            <input type="text" name="tipo" id="tipo" class="d-none" value="refugio">
+                            <input type="text" name="id" id="id" class="d-none" value=" {{ clave }} ">
+                            <button class="border border-0 bg-transparent fs-1 mx-3" type="submit" name="accion" value="Aceptar"><i class="fa-solid fa-circle-check txt-alga"></i></button>
+                            <button class="border border-0 bg-transparent fs-1" type="submit" name="accion" value="Rechazar"><i class="fa-solid fa-circle-xmark txt-verde"></i></button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <a class="text-decoration-none my-4 bg-verde txt-claro border-0 fs-5 col-2 btn btn-lg" href="#">Salir</a>
+    </div>
+{% endblock %}
