@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %} Refugios - Patitas Perdidas {% endblock %}
+{% block styles %} <link rel="stylesheet" href="{{ url_for('static', filename= 'css/styles_refugios.css') }}"/> {% endblock %}
+{% set color_fondo = "bg-gris" %}
+{% set color_letras = "txt-verde" %}
+{% block content %}
+    <div class="container">
+        <div class="bg-verde rounded-3">
+            <h1 class="text-light ps-3 pt-4">Refugios en nuestra red</h1>
+            <p class="text-light py-4 ps-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Asperiores veniam harum qui incidunt sit? Fugit itaque molestias, quia quam labore, cumque, pariatur maiores at sunt in corporis sapiente alias nostrum.</p>
+        </div>
+
+        <!-- Mapa -->
+        <div id="map" class="my-4 rounded-3 bg-light"></div>
+
+        <!-- Refugios -->
+        <div class="row gx-3 row-cols-4 px-4 py-5">
+            {% for refugio in refugios['refugios'] %}
+            <div class="col-3 tarjeta-refugio" data-nombre="{{ refugio['nombre'] }}" data-coordx="{{ refugio['coordx'] }}" data-coordy="{{ refugio['coordy'] }}">
+                <div class="position-relative">
+                    <span class="position-absolute top-0 start-0 translate-middle p-2 bg-white border border-light rounded-circle">
+                        <i class="txt-naranja fa-solid fa-shield-heart fs-3"></i>
+                    </span>
+                </div>
+                <div class="bg-crema p-4 text-center rounded-3 mb-3">
+                    <h2 class="mt-2">{{ refugio['nombre'] }}</h2>
+                    <h5 class="m-0">Contacto:</h5>
+                    <p class="m-0 text-black">Teléfono: {{ refugio['contacto'] }}</p>
+                    <h5 class="m-0">Dirección:</h5>
+                    <p>{{ refugio['direccion'] }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Agregar refugio -->
+        <div class="bg-verde p-4 rounded-3 d-flex flex-md-row flex-column justify-content-evenly align-items-center mb-3">
+            <p class="text-light fs-3 fw-bold m-0 text-center text-md-start lh-1 mb-3 mb-md-0">¿Querés unirte a nuestra red?</p>
+            <a href="{{ url_for('refugios') }}" class="btn bg-amarillo btn-warning border-0 rounded-pill w-auto px-5 fs-5 m-0">Agregar mi refugio</a>
+        </div>
+    </div>
+{% endblock %}
