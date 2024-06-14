@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% block title %} Refugios - Patitas Perdidas {% endblock %}
-{% block styles %} <link rel="stylesheet" href="{{ url_for('static', filename= 'css/styles_refugios.css') }}"/> {% endblock %}
+{% block styles %} 
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/styles_refugios.css') }}"/>
+<!-- css - leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}">
+{% endblock %}
 {% set color_fondo = "bg-gris" %}
 {% set color_letras = "txt-verde" %}
 {% block content %}
@@ -36,7 +42,14 @@
         <!-- Agregar refugio -->
         <div class="bg-verde p-4 rounded-3 d-flex flex-md-row flex-column justify-content-evenly align-items-center mb-3">
             <p class="text-light fs-3 fw-bold m-0 text-center text-md-start lh-1 mb-3 mb-md-0">¿Querés unirte a nuestra red?</p>
-            <a href="{{ url_for('refugios') }}" class="btn bg-amarillo btn-warning border-0 rounded-pill w-auto px-5 fs-5 m-0">Agregar mi refugio</a>
+            <a href="{{ url_for('agregar_refugio') }}" class="btn bg-amarillo btn-warning border-0 rounded-pill w-auto px-5 fs-5 m-0">Agregar mi refugio</a>
         </div>
     </div>
 {% endblock %}
+
+{% block scripts %}
+    <!--  js - leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="{{ url_for('static', filename='js/leaflet/leaflet_refugios.js') }}"></script>
+{% endblock scripts %}
