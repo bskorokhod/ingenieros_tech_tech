@@ -5,6 +5,26 @@ app = Flask(__name__)
 PUERTO_APP = 5000
 #HOST_API=""
 
+
+@app.route('/refugios')
+def refugios():
+    
+    try:
+        response = requests.get(HOST_API + ENDPOINT_API_REFUGIO, json={}) # Mando un json vacio xq asi me lo solicitan para poder diferencia dos metodos GET
+        
+        refugios = response.json()
+        
+        if response.status_code == 200:
+            return render_template('refugios.html', refugios={'refugios': refugios})
+        
+        return internal_server_error(response.status_code)
+
+    except requests.exceptions.HTTPError as e:
+        return internal_server_error(e)
+    except requests.exceptions.RequestException as e:
+        return internal_server_error(e)
+
+
 @app.route('/agregar_refugio', methods=['GET', 'POST'])
 def agregar_refugio():
     if request.method == "POST":
