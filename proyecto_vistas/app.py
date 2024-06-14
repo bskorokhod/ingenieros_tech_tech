@@ -38,7 +38,7 @@ def aceptado(formulario):
 
         # si falla la petición, se redirige a la página de error 500
         if response.status_code != 201:
-            return redirect("internal_server_error", e=response.status_code)
+            return internal_server_error(e=response.status_code)
 
     return render_template("aceptado.html", form=formulario)
 
@@ -66,6 +66,7 @@ def perdido():
         datos_mascota_perdida['telefono_contacto'] = request.form.get('telefono_contacto') 
         datos_mascota_perdida['nombre_contacto'] = request.form.get('nombre_contacto')
         datos_mascota_perdida['info_adicional'] = request.form.get('info_adicional')
+        datos_mascota_perdida['direccion'] = request.form.get('direccion')
 
         # Pegarle a la API para insertar el nuevo registro en la BBDD
         # Los campos sin completar se envían como cadenas vacías
@@ -73,7 +74,7 @@ def perdido():
         if response.status_code == 201:
             return redirect(url_for("aceptado", formulario="mascota"))
         else:
-            return redirect(url_for('internal_server_error', e=response.status_code)) # Función que renderiza un template de error 500
+            return internal_server_error(e=response.status_code) # Función que renderiza un template de error 500
 
     elif request.method == 'GET':
         response = requests.get(HOST_API + '/caracteristicas_mascotas')
@@ -81,7 +82,7 @@ def perdido():
             caracteristicas_animales = response.json()
             return render_template('form_mascotas.html', caracteristicas_animales=caracteristicas_animales)
         else:
-            return redirect(url_for('internal_server_error', e=response.status_code))
+            return internal_server_error(e=response.status_code)
 
 @app.route('/encontrado', methods=["GET", "POST"])
 def encontrado():
@@ -90,7 +91,7 @@ def encontrado():
     if datos_caracteristicas.status_code == 200:
         caracteristicas_animales = datos_caracteristicas.json()
     else:
-        return redirect(url_for('internal_server_error', e=datos_caracteristicas.status_code))
+        return internal_server_error(e=datos_caracteristicas.status_code)
     
     filtros_busqueda = ""
 
@@ -105,7 +106,7 @@ def encontrado():
     if datos_mascotas.status_code == 200:
         mascotas_perdidas = datos_mascotas.json()
     else:
-        return redirect(url_for('internal_server_error', e=datos_mascotas.status_code))
+        return internal_server_error(e=datos_mascotas.status_code)
 
     return render_template('mascotas_perdidas.html', caracteristicas = caracteristicas_animales, mascotas = mascotas_perdidas)
 
