@@ -14,12 +14,12 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta
     <div class="txt-verde">
       <h3 class="fw-semibold"><i class="fa-solid fa-circle-info"></i> Datos sobre tu refugio</h3>
         <form class="row g-3 needs-validation" novalidate action="{{ url_for('agregar_refugio') }}" method="POST" id="formulario">
-          <input type="text" name="direccion" id="direccion" class="d-none" value="">
+          <input type="text" name="direccion" id="direccion" maxlength="100" class="d-none" value="">
           <input type="text" name="coordx" id="coordx" class="d-none" value="">
           <input type="text" name="coordy" id="coordy" class="d-none" value="">  
           <div class="col-md-12">
               <label for="nombre_refugio" class="form-label">Nombre del refugio</label>
-              <input name="nombre_refugio" type="text" class="form-control bg-gris" id="nombre_refugio" required>
+              <input name="nombre_refugio" type="text" maxlength="64" class="form-control bg-gris" id="nombre_refugio" required>
               <div class="invalid-feedback">
                 Campo requerido!
               </div>
@@ -27,7 +27,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta
 
             <div class="col-md-12">
                 <label for="inputTelefonoContacto" class="form-label">Número de teléfono</label>
-                <input name="telefono_refugio" type="tel" minlength="7" pattern="[0-9]*" class="form-control bg-gris" id="inputTelefonoContacto" required>
+                <input name="telefono_refugio" type="tel" minlength="8" maxlength="20" pattern="/d+" class="form-control bg-gris" id="inputTelefonoContacto" required>
                 <div class="invalid-feedback">
                   Campo requerido!
                 </div>
