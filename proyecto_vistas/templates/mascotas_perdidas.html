@@ -72,9 +72,9 @@
                 <label for="edadMascota" class="form-label text-light fs-5">Edad</label>
                 <select id="edadMascota" name="edad" class="form-select mb-4">
                     <option value="" selected></option>
+                    <option value="cachorro">Cachorro</option>
                     <option value="joven">Joven</option>
                     <option value="adulto">Adulto</option>
-                    <option value="geronte">Geronte</option>
                 </select>
 
                 <div class="d-flex justify-content-end">
@@ -105,17 +105,20 @@
                     {% endif %}
 
                     <!-- TARJETA MASCOTA {{ mascota['id'] }} -->
-                    <div class="col-4 tarjeta-mascota" data-nombre="{{ mascota['nombre'] }}" data-coordx="{{ mascota['coordx'] }}" data-coordy="{{ mascota['coordy'] }}">
-                        <div class="bg-alga d-flex p-4 m-0 rounded-4">
-                            <div class="col-8 m-0 p-0 pe-2">
-                                <h3 class="text-light fs-2 fw-medium m-0 lh-sm">{{ mascota['nombre'] }}</h3>
-                                <p class="fs-4 fw-light lh-1">{{ mascota['raza'] }}</p>
-                                <button name="btnVerMas" data-bs-toggle="modal" data-bs-target="#modalMascota{{ mascota['id'] }}"
-                                    id="verMas{{ mascota['id'] }}" class="btn col-12 bg-gris rounded-pill p-2 align-self-end">Ver más</button>
+                    <div class="col-4 tarjeta-mascota h-auto" data-nombre="{{ mascota['nombre_mascota'] }}" data-coordx="{{ mascota['coordx'] }}" data-coordy="{{ mascota['coordy'] }}">
+                        <div class="bg-alga d-flex flex-column p-4 m-0 rounded-4 h-100 justify-content-between">
+                            <div class="m-0 p-0">
+                                <h3 class="text-light fs-2 fw-medium m-0 lh-sm">{{ mascota['nombre_mascota'] }}</h3>
+                                <p class="fs-4 fw-light mb-0">{{ mascota['raza'] }}</p>
                             </div>
-                            <svg class="col-4 align-self-end m-0 p-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                                <path fill="#114232" d="{{ dir_svg }}" />
-                            </svg>
+
+                            <div class="row gx-3 m-0 p-0">
+                                <button name="btnVerMas" data-bs-toggle="modal" data-bs-target="#modalMascota{{ mascota['id'] }}"
+                                id="verMas{{ mascota['id'] }}" class="btn col-7 bg-gris rounded-pill p-2 align-self-end">Ver más</button>
+                                <svg class="col-5 pe-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                    <path fill="#114232" d="{{ dir_svg }}" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
@@ -124,7 +127,7 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header border-0 px-4 pb-2">
-                                    <h3 class="modal-title fw-semibold">{{ mascota['nombre'] }}</h3>
+                                    <h3 class="modal-title fw-semibold">{{ mascota['nombre_mascota'] }}</h3>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                                 </div>
@@ -145,7 +148,7 @@
                                             <!-- info adicional -->
                                             <div class="bg-gris rounded-3 p-4 mb-2">
                                                 <h5 class="fw-medium">Información adicional</h5>
-                                                <p class="mb-1">{{ mascota['info_adicional'] }}</p>
+                                                <p class="mb-1 text-break">{{ mascota['info_adicional'] }}</p>
 
                                             </div>
 
