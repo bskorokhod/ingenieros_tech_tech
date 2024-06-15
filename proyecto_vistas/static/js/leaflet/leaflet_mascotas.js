@@ -1,6 +1,10 @@
-// creo el ícono de la patita
-const icono_patita = L.icon({
-    iconUrl: '../static/icons/paw-solid-verde.svg',
+// creo los íconos de las patitas
+const pata_perro = L.icon({
+    iconUrl: '../static/icons/pata_perro.svg',
+    iconSize: [50, 50]
+});
+const pata_gato = L.icon({
+    iconUrl: '../static/icons/pata_gato.svg',
     iconSize: [30, 30]
 });
 
@@ -19,6 +23,11 @@ for (let mascota of tarjetas_mascotas) {
     let latitud = mascota.dataset.coordy;
     let coordenadas = [latitud, longitud];
 
-    let marcador = L.marker(coordenadas, { icon: icono_patita }).addTo(mapa);
-    marcador.bindPopup(mascota.dataset.nombre, { closeButton: false, className: 'popup_mascota' });
+    if (mascota.dataset.animal == 'perro') {
+        let marcador = L.marker(coordenadas, { icon: pata_perro }).addTo(mapa);
+        marcador.bindPopup(mascota.dataset.nombre, { closeButton: false, className: 'popup_mascota' });
+    } else {
+        let marcador = L.marker(coordenadas, { icon: pata_gato }).addTo(mapa);
+        marcador.bindPopup(mascota.dataset.nombre, { closeButton: false, className: 'popup_mascota' });
+    }
 }
