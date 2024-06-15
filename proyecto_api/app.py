@@ -5,7 +5,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 # Por ahora, hosteamos la BBDD locaclmente, con el nombre mascotas
 CONECTOR_SQL = "mysql+mysqlconnector://root@localhost/mascotas"
-QUERY_OBTENER_CARACTERISTICAS = "SELECT * FROM caracteristicas_mascotas" # Probar seleccionando sólo las columnas que no tienen id 
 
 engine = create_engine(CONECTOR_SQL)
 
@@ -14,9 +13,10 @@ PUERTO_API = 5001
 
 @app.route('/caracteristicas_mascotas', methods=['GET'])
 def obtener_tabla_caracteristicas():
+    query =  "SELECT * FROM caracteristicas_mascotas" # Probar seleccionando sólo las columnas que no tienen id
     try:
         with engine.connect() as conn:
-            response = conn.execute(text(QUERY_OBTENER_CARACTERISTICAS))
+            response = conn.execute(text(query))
             data = {}
             for row in response:
                 if row.animal not in data:
@@ -86,7 +86,10 @@ def mascotas_perdidas():
 
         # .mappings() me permite generar diccionarios con las columnas y los valores de la fila correspondiente
         for mascota in filas_mascotas.mappings():
-            mascotas_perdidas.append(dict(mascota))
+            dict_mascota = dict(mascota)
+            dict_mascota['fecha_extravio'] = dict_mascota['fecha_extravio'].strftime("%d/%m/%Y")
+
+            mascotas_perdidas.append(dict_mascota)
 
         return jsonify(mascotas_perdidas), 200
 

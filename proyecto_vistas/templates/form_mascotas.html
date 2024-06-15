@@ -1,5 +1,7 @@
 {% extends "base_formulario.html" %}
 
+{% block title %}Formulario mascota perdida{% endblock title %}
+ 
 {% block titulo_formulario %}¡Perdí mi mascota! ¿Qué hago?{% endblock titulo_formulario %}
 
 {% block explicacion_formulario %}
@@ -10,14 +12,14 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta
     <div class="txt-verde">
       <h3 class="fw-semibold"><i class="fa-solid fa-circle-info"></i> Datos sobre tus mascota</h3>
 
-        <form class="row g-3 needs-validation" novalidate action="{{ url_for('perdido') }}" method="POST">
+        <form class="row g-3 needs-validation" novalidate action="{{ url_for('perdido') }}" method="POST" id="formulario">
           <input type="text" name="direccion" id="direccion" class="d-none" value="">
             <input type="text" name="coordx" id="coordx" class="d-none" value="">
             <input type="text" name="coordy" id="coordy" class="d-none" value="">
 
             <div class="col-md-4">
               <label for="inputNombre" class="form-label">Nombre de la mascota</label>
-              <input name="nombre_mascota" id="inputNombre" type="text" class="form-control bg-gris focus-ring-alga" required>
+              <input name="nombre_mascota" id="inputNombre" type="text" maxlength="20" class="form-control bg-gris focus-ring-alga" required>
               <div class="invalid-feedback">
                 Campo requerido!
               </div>
@@ -62,7 +64,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta
 
             <div class="col-md-4">
                 <label for="razaMascota" class="form-label">Raza</label>
-                <select name="raza" id="razaMascota" class="form-select bg-gris focus-ring-alga" required>
+                <select name="raza" id="razaMascota" class="form-select bg-gris focus-ring-alga" required disabled>
                   <option selected></option>
                   {% for tipo, caracteristicas in caracteristicas_animales.items() %}
                   {% for raza in caracteristicas['raza'] %}
@@ -77,7 +79,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta
 
             <div class="col-md-4">
               <label for="colorPrincipalMascota" class="form-label">Color principal</label>
-              <select name="color" id="colorPrincipalMascota" class="form-select bg-gris focus-ring-alga" required>
+              <select name="color" id="colorPrincipalMascota" class="form-select bg-gris focus-ring-alga" required disabled>
                 <option selected></option>
                 {% for tipo, caracteristicas in caracteristicas_animales.items() %}
                 {% for color in caracteristicas['color'] %}
@@ -100,13 +102,13 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta
 
             <div class="mb-3 col-9 ">
                 <label for="FormControlTextareaComentarios" class="form-label">Comentarios adicionales</label>
-                <textarea name="info_adicional" class="form-control bg-gris focus-ring-alga" id="FormControlTextareaComentarios" rows="3"></textarea>
+                <textarea name="info_adicional" maxlength="280" class="form-control bg-gris focus-ring-alga" id="FormControlTextareaComentarios" rows="3"></textarea>
               </div>  
 
             <div class="row mb-2">
                 <label for="inputNombreContacto" class="col-sm-2 col-form-label">Nombre de contacto</label>
                 <div class="col-sm-10">
-                  <input name="nombre_contacto" class="form-control bg-gris focus-ring-alga" type="text" id="inputNombreContacto" required>
+                  <input name="nombre_contacto" maxlength="64" class="form-control bg-gris focus-ring-alga" type="text" id="inputNombreContacto" required>
                   <div class="invalid-feedback">
                     Campo requerido!
                   </div>
@@ -116,7 +118,7 @@ Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta
             <div class="row mb-3">
                 <label for="inputTelefonoContacto" class="col-sm-2 col-form-label">Teléfono de contacto</label>
                 <div class="col-sm-10">
-                  <input name="telefono_contacto" class="form-control bg-gris focus-ring-alga" type="tel" id="inputTelefonoContacto" required>
+                  <input name="telefono_contacto" pattern="\d+" minlength="8" maxlength="20" class="form-control bg-gris focus-ring-alga" type="tel" id="inputTelefonoContacto" required>
                   <div class="invalid-feedback">
                     Campo requerido!
                   </div>

@@ -11,3 +11,8 @@
     height: 100vh;
     padding-bottom: 15vh;
 }
+
+#testimonios img{
+    height: 35vh;
+    width: 35vh;
+}
