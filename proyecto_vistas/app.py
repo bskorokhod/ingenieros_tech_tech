@@ -17,12 +17,12 @@ def admin_config():
         response_sesion = requests.get(HOST_API + ENDPOINT_API_LOGIN, json={"user": usuario, "password": contraseña})
 
         if response_sesion.status_code >= 500:
-            return redirect(url_for("internal_server_error"))
+            return internal_server_error(e=response_sesion.status_code)
 
         sesion = response_sesion.json()
 
         if not isinstance(sesion, dict) or "code" not in sesion or not isinstance(sesion.get("code"), int) or sesion.get("code", -1) < 0 or sesion.get("code", 2) > 1:
-            return redirect(url_for("internal_server_error"))
+            return internal_server_error(e=500)
 
         if sesion == 1:
 
@@ -42,7 +42,7 @@ def admin_config():
                         requests.delete(HOST_API + ENDPOINT_API_REFUGIO, json={"id": id})
                     
                     else:
-                        return redirect(url_for("internal_server_error"))
+                        return internal_server_error(e=500)
 
                 elif tipo == "reencuentro":
                     
@@ -55,16 +55,20 @@ def admin_config():
                         requests.patch(HOST_API + ENDPOINT_API_REPORTES, json={"id reporte": id_reporte})
                     
                     else:
-                        return redirect(url_for("internal_server_error"))
+                        return internal_server_error(e=500)
                 
                 else:
-                    return redirect(url_for("internal_server_error"))
+                    return internal_server_error(e=500)
 
             response_refugios = requests.get(HOST_API + ENDPOINT_API_REFUGIO, json={"aceptado": "false"})
-            response_reportes = requests.get(HOST_API + ENDPOINT_API_REPORTES, json={"fue_procesado": False})
             
-            if response_refugios.status_code >= 500 or response_reportes.status_code >= 500:
-                return redirect(url_for("internal_server_error"))
+            if response_refugios.status_code >= 500:
+                return internal_server_error(e=response_refugios.status_code)
+
+            response_reportes = requests.get(HOST_API + ENDPOINT_API_REPORTES, json={"fue_procesado": False})
+
+            if response_reportes.status_code >= 500:
+                return internal_server_error(e=response_reportes.status_code)
 
             refugios = response_refugios.json()
             reportes = response_reportes.json()
