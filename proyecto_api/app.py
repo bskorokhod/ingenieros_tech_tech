@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
-from queries import traer_info, realizar_cambios
+from queries import traer_info, realizar_cambios, realizar_query_validacion
 
 # Por ahora, hosteamos la BBDD locaclmente, con nombre el nombre mascotas
 CONECTOR_SQL = "mysql+mysqlconnector://root@localhost/mascotas"
