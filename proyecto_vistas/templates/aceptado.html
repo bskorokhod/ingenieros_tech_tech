@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Solicitud aceptada{% endblock %}
+
+{% set color_fondo = 'bg-verde' %}
+{% set color_letras = 'txt-crema' %}
+
+<!-- dependiendo del formulario que se haya completado, se adapta el mensaje a renderizar -->
+{% if form == "mascota" %}
+    {% set icono = "fa-user-check" %}
+    {% set titulo = "¡Gracias por confiar en nosotros!" %}
+    {% set mensaje = "Tu mascota ha sido agregada a nuestra base de datos de mascotas perdidas, ¡esperamos que vuelva a casa pronto!" %}
+{% elif form == "refugio" %}
+    {% set icono = "fa-house-circle-check" %}
+    {% set titulo = "¡Gracias por sumarte!" %}
+    {% set mensaje = "Tu refugio ha sido agregado a nuestra base de datos de refugios, ¡esperamos que puedas ayudar a muchos animales!" %}
+{% elif form == "reencuentro" %}
+    {% set icono = "fa-home" %}
+    {% set titulo = "¡Nos alegramos por tu reencuentro!" %}
+    {% set mensaje = "¡Nos pondremos en contacto a la brevedad para validar el reencuentro!" %}
+{% else %}
+    {% set icono = "fa-exclamation-triangle" %}
+    {% set titulo = "¡Ups! Algo salió mal" %}
+    {% set mensaje = "No se completó ningún formulario" %}
+{% endif %}
+
+{% block content %}
+<main class="d-flex justify-content-center my-5">
+    <div class="bg-white text-center mb-5 px-5 py-4 rounded col-md-5 col-sm-7 col-9">
+        <i class="txt-verde fa-solid {{ icono }} fs-1"></i>
+        <h1 class="txt-alga fs-3 fw-bold mt-2 mb-4">{{ titulo }}</h1>
+        <p class="mb-4">{{ mensaje }}</p>
+        <a href="{{ url_for('home') }}">
+            <button class="btn-alga-gris col-6 py-2 fs-6 rounded-4">Volver</button>
+        </a>
+    </div>
+</main>
+{% endblock %}
