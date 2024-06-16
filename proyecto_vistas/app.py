@@ -7,7 +7,7 @@ app = Flask(__name__)
 def login():
     return render_template('login.html')
 
-@app.route('/admin', methods=['POST', 'PATCH', 'PUT', 'DELETE'])
+@app.route('/admin', methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
 def admin_config():
     """
     FLUJO GENERAL DEL ENDPOINT `/admin`
@@ -40,6 +40,8 @@ def admin_config():
 
     Si la sesión es válida se renderiza la vista `/admin`, sino se redirige a `/login_admin`.
     """
+    if request.method == "GET":
+        return redirect(url_for('login'))
 
     # Antes de cargar la página se verifica la sesión
     usuario = request.form.get("usuario")
@@ -145,13 +147,33 @@ def admin_config():
         refugios = response_refugios.json()
         reportes = response_reportes.json()
 
+        if (not refugios or
+            "refugios" not in refugios or
+            "hay_pag_siguiente" not in refugios or
+            not reportes or
+            "reportes_reencuentro" not in reportes or
+            "hay_pag_siguiente" not in reportes):
+            return internal_server_error(e=500)
+        
+        if num_pagina_refugios <= 1:
+            hay_pag_ant_refugios = False
+        elif num_pagina_refugios > 1:
+            hay_pag_ant_refugios = True
+        
+        if num_pagina_reportes <= 1:
+            hay_pag_ant_reportes = False
+        elif num_pagina_reportes > 1:
+            hay_pag_ant_reportes = True
+
         return render_template('admin.html',
                                 usuario = usuario,
                                 contraseña = contraseña,
-                                refugios = refugios,
-                                reportes = reportes,
-                                limite_refugios = LIMITE_REPORTES_REFUGIOS, # Sujeto a cambios
-                                limite_reportes = LIMITE_REPORTES_REENCUENTRO, # Sujeto a cambios
+                                refugios = refugios.get("refugios"),
+                                reportes = reportes.get("reportes_reencuentro"),
+                                hay_pag_sig_refugios = refugios.get("hay_pag_siguiente", False),
+                                hay_pag_sig_reportes = reportes.get("hay_pag_siguiente", False),
+                                hay_pag_ant_refugios = hay_pag_ant_refugios,
+                                hay_pag_ant_reportes = hay_pag_ant_reportes,
                                 pag_actual_refugios = num_pagina_refugios,
                                 pag_actual_reportes = num_pagina_reportes)
 
