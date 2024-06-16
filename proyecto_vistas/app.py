@@ -5,7 +5,6 @@ from config_app import PUERTO_APP, HOST_API, ENDPOINT_API_REFUGIO, ENDPOINT_API_
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -18,13 +17,41 @@ def admin_config():
 def login():
     return "vista login admin"
 
+@app.route('/refugios')
+def refugios():
+    
+    try:
+        response = requests.get(HOST_API + ENDPOINT_API_REFUGIO, json={}) # Mando un json vacio xq asi me lo solicitan para poder diferencia dos metodos GET
+        
+        refugios = response.json()
+        
+        if response.status_code == 200:
+            return render_template('refugios.html', refugios={'refugios': refugios})
+        
+        return internal_server_error(response.status_code)
+
+    except requests.exceptions.HTTPError as e:
+        return internal_server_error(e)
+    except requests.exceptions.RequestException as e:
+        return internal_server_error(e)
+
+
 @app.route('/agregar_refugio', methods=['GET', 'POST'])
 def agregar_refugio():
-    return "vista agregar_refugio"
-
-@app.route('/refugios', methods=['GET', 'POST'])
-def refugios():
-    return "vista refugios"
+    if request.method == "POST":
+        # Obtengo todos los elementos del formulario y los envío
+        body = {}
+        body["nombre"] = request.form.get("nombre_refugio")
+        body["coord_x"] = request.form.get("coordx")
+        body["coord_y"] = request.form.get("coordy")
+        body["telefono"] = request.form.get("telefono_refugio")
+        body["direccion"] = request.form.get("direccion")
+        response = requests.post(HOST_API + "/refugios", json = body) 
+        if response.status_code == 201: # verifico que no ocurrió un error
+            return render_template("formulario_valido.html")
+        # Si ocurrió un error, redirijo al error_handler
+        return redirect(url_for('internal_server_error', e=response.status_code))
+    return render_template("form_refugios.html")
 
 @app.route("/aceptado/", defaults={"formulario": None})
 @app.route("/aceptado/<formulario>", methods=["GET", "POST"])
