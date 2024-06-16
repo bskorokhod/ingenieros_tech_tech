@@ -1,42 +1,49 @@
 import re
 from datetime import datetime
+from config_api import LISTA_RAZAS_ANIMAL, LISTA_SEXOS, LISTA_COLORES_ANIMAL, LISTA_EDADES
 
-# Validaciones de tipo de dato basicas
-def es_id(id :str) -> bool:
+# Validaciones de tipo de dato básicas
+def es_id(id) -> bool:
     """ 
-    Verifica si la cadena `id` es un número entero positivo.
+    Verifica si `id` es un número entero positivo.
     """
-    if id.isdecimal():
-        return int(id) > 0
+    # Se convierte a string para evitar excepciones al usar el método isdecimal()
+    id = str(id)
+    if id.isdecimal(): return int(id) > 0
     return False
     
-def es_float(valor :str) -> bool:
+def es_float(valor) -> bool:
     """ 
-    Verifica si una cadena se puede convertir a número flotante.
+    Verifica si `valor` se puede convertir a número flotante.
     """
+    # Se convierte a string para evitar excepciones al usar el método match()
+    valor = str(valor)
     # Expresión regular para un número float
     regex_float = r'^[-+]?\d+\.\d+$'
     return bool(re.match(regex_float, valor))
 
-def es_telefono(telefono: str) -> bool:
+def es_telefono(telefono) -> bool:
     """ 
     Verifica si un dato es un teléfono válido.
     """
-    return dato.isdecimal() and 8 <= len(telefono) <= 20
+    # Se convierte a string para evitar excepciones al usar el método isdecimal() y la función len()
+    telefono = str(telefono)
+    return telefono.isdecimal() and 8 <= len(telefono) <= 20
 
-def es_fecha(fecha: str) -> bool:
+def es_fecha(fecha) -> bool:
     """
     Verifica que un dato sea una fecha existente con el formato AAAA-MM-DD 
     y ademas sea posterior al 2000-01-01 y anterior a la fecha actual.
     """
-    
+    # Se convierte a string para evitar excepciones al usar el método match()
+    fecha = str(fecha)
+
     # Expresión regular para una fecha con el formato AAAA-MM-DD
     regex_fecha = r'^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$'
     
     if not re.match(regex_fecha, fecha):
         return False
     
-    # Separar el dato en partes
     anio, mes, dia = map(int, fecha.split('-'))
     
     # Días máximos por mes
@@ -52,10 +59,12 @@ def es_fecha(fecha: str) -> bool:
 
     return False
 
-def es_varchar(palabra: str, largo: int) -> bool:
+def es_varchar(palabra, largo: int) -> bool:
     """
-    Verifica si una cadena tiene una longitud menor o igual a la especificada.
+    Verifica si `palabra` tiene una longitud menor o igual a la especificada.
     """
+    # Se convierte a string para evitar excepciones al usar la función len()
+    palabra = str(palabra)
     return len(palabra) <= largo
 
 # Validaciones de tipos en base de datos
@@ -65,14 +74,20 @@ def es_animal_perdido(datos :dict) -> bool:
 
     PRE:
         - `datos` es un diccionario.
+        - los elementos de LISTA_RAZAS_ANIMAL, LISTA_SEXOS, LISTA_COLORES_ANIMAL, LISTA_EDADES representan 
+        las opciones posibles para los campos correspondientes de la tabla animales_perdidos.
+        - las claves del dict LISTA_RAZAS_ANIMALES son las mismas a las de LISTA_COLORES_ANIMALES y corresponden
+        a los valores posibles del campo animal de la tabla animales_perdidos.
 
     POS:
         - Devuelve True si las claves del diccionario `datos` corresponden a las columnas de la tabla animales_perdidos y
         los valores asociados son campos válidos para la misma. Caso contrario, devuelve False.
     """
     try:
-        # Se tiene en cuenta que el campo info_adicional es opcional    
-        return es_varchar(datos['nombre_mascota'], 20) and es_varchar(datos['animal'], 5) and es_varchar(datos['raza'], 30) and es_varchar(datos['sexo'], 9) and es_varchar(datos['color'], 8) and es_varchar(datos['edad'], 9) and es_varchar(datos['direccion'], 100) and es_float(datos['coordx']) and es_float(datos['coordy']) and es_fecha(datos['fecha_extravio']) and es_telefono(datos['telefono_contacto']) and es_varchar(datos['nombre_contacto'], 64) and es_varchar(datos.get('info_adicional', ""), 280)
+        animal = datos['animal']
+        # Se tiene en cuenta que el campo info_adicional es opcional. En los casos en los que la entrada es obligatoria, de no enviarse el campo ocurre una excepción de tipo KeyError 
+        # El tipo de mascota se verifica implícitamente al usarlo como clave en LISTA_RAZAS_ANIMAL y LISTA_COLORES_ANIMAL, ya que si no es una clave válida ocurriría una excepción de tipo KeyError
+        return es_varchar(datos['nombre_mascota'], 20) and (datos['raza'] in LISTA_RAZAS_ANIMAL[animal]) and (datos['sexo'] in LISTA_SEXOS) and (datos['color'] in LISTA_COLORES_ANIMAL[animal]) and (datos['edad'] in LISTA_EDADES) and es_varchar(datos['direccion'], 100) and es_float(datos['coordx']) and es_float(datos['coordy']) and es_fecha(datos['fecha_extravio']) and es_telefono(datos['telefono_contacto']) and es_varchar(datos['nombre_contacto'], 64) and es_varchar(datos.get('info_adicional', ""), 280)
     except KeyError:
         return False
 
