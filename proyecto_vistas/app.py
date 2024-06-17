@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request
 import requests
 from config_app import PUERTO_APP, HOST_API, ENDPOINT_API_REFUGIO, ENDPOINT_API_REPORTES, ENDPOINT_API_LOGIN, ENDPOINT_API_CARACTERISTICAS, ENDPOINT_API_PERDIDAS
-
+from validaciones import es_refugio
 
 app = Flask(__name__)
 
@@ -209,17 +209,22 @@ def refugios():
 def agregar_refugio():
     if request.method == "POST":
         # Obtengo todos los elementos del formulario y los envío
-        body = {}
-        body["nombre"] = request.form.get("nombre_refugio")
-        body["coord_x"] = request.form.get("coordx")
-        body["coord_y"] = request.form.get("coordy")
-        body["telefono"] = request.form.get("telefono_refugio")
-        body["direccion"] = request.form.get("direccion")
-        response = requests.post(HOST_API + "/refugios", json = body) 
+        nuevo_refugio = {}
+        nuevo_refugio["nombre"] = request.form.get("nombre_refugio")
+        nuevo_refugio["coordx"] = request.form.get("coordx")
+        nuevo_refugio["coordy"] = request.form.get("coordy")
+        nuevo_refugio["telefono"] = request.form.get("telefono_refugio")
+        nuevo_refugio["direccion"] = request.form.get("direccion")
+
+        if not es_refugio(nuevo_refugio):
+            return bad_request(e=400), 400
+        
+        response = requests.post(HOST_API + ENDPOINT_API_REFUGIO, json = nuevo_refugio) 
         if response.status_code == 201: # verifico que no ocurrió un error
-            return render_template("formulario_valido.html")
+            return redirect(url_for("aceptado", formulario="refugio"))
         # Si ocurrió un error, redirijo al error_handler
-        return redirect(url_for('internal_server_error', e=response.status_code))
+        return internal_server_error(e=response.status_code)
+    
     return render_template("form_refugios.html")
 
 @app.route("/aceptado/", defaults={"formulario": None})

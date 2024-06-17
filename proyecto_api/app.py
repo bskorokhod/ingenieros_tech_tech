@@ -445,11 +445,11 @@ def refugios():
         informacion = request.get_json()
         # Queda pendiente validar si las claves se encuentran en el json
         nombre_refugio = informacion.get("nombre")
-        coord_x = informacion.get("coord_x")
-        coord_y = informacion.get("coord_y")
+        coord_x = informacion.get("coordx")
+        coord_y = informacion.get("coordy")
         telefono = informacion.get("telefono")
         direccion = informacion.get("direccion")
-        query = f"INSERT INTO {TABLA_REFUGIOS} (nombre, coord_x, coord_y, telefono, direccion) VALUES '{nombre_refugio}', '{coord_x}', '{coord_y}', '{telefono}', '{direccion}';" 
+        query = f"INSERT INTO {TABLA_REFUGIOS} (nombre, coordx, coordy, telefono, direccion) VALUES ('{nombre_refugio}', '{coord_x}', '{coord_y}', '{telefono}', '{direccion}');" 
         try:
             with engine.begin() as conexion:
                 resultado = conexion.execute(text(query))
