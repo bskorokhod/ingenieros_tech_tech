@@ -1,0 +1,12 @@
+#resultados > p{
+    cursor: pointer;
+}
+
+#map{
+    height: 100%;
+}
+
+input:focus, textarea:focus {
+    border-color: #87A922 !important;
+    box-shadow: 0 0 0 0.2rem rgba(135, 169, 34, 0.25) !important;
+}

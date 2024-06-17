@@ -1,0 +1,58 @@
+{% extends "base_formulario.html" %}
+
+{% block title %}Formulario refugios{% endblock title %}
+
+{% block titulo_formulario %}
+¡Perdí mi mascota! ¿Qué hago?
+{% endblock titulo_formulario %}
+
+{% block explicacion_formulario %}
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Error blanditiis soluta alias fugiat sit sunt vitae reiciendis voluptas, numquam officia, enim autem earum quas aperiam, nobis aliquid asperiores ratione. Saepe!
+{% endblock explicacion_formulario %}
+
+{% block formulario %}
+    <div class="txt-verde">
+      <h3 class="fw-semibold"><i class="fa-solid fa-circle-info"></i> Datos sobre tu refugio</h3>
+        <form class="row g-3 needs-validation" novalidate action="{{ url_for('agregar_refugio') }}" method="POST" id="formulario">
+          <input type="text" name="direccion" id="direccion" maxlength="100" class="d-none" value="">
+          <input type="text" name="coordx" id="coordx" class="d-none" value="">
+          <input type="text" name="coordy" id="coordy" class="d-none" value="">  
+          <div class="col-md-12">
+              <label for="nombre_refugio" class="form-label">Nombre del refugio</label>
+              <input name="nombre_refugio" type="text" maxlength="64" class="form-control bg-gris" id="nombre_refugio" required>
+              <div class="invalid-feedback">
+                Campo requerido!
+              </div>
+            </div>
+
+            <div class="col-md-12">
+                <label for="inputTelefonoContacto" class="form-label">Número de teléfono</label>
+                <input name="telefono_refugio" type="tel" minlength="8" maxlength="20" pattern="/d+" class="form-control bg-gris" id="inputTelefonoContacto" required>
+                <div class="invalid-feedback">
+                  Campo requerido!
+                </div>
+              </div>
+            
+            <div class="col-12">
+              <button type="submit" class="btn txt-crema bg-alga fw-medium btn-alga-gris">Enviar datos</button>
+            </div>
+
+          </form>    
+     </div>
+    </div>
+</main>
+{% endblock formulario %}
+
+{% block scripts %}
+<!-- validacion_formulario -->
+<script src="{{ url_for('static', filename='js/validacion_formulario.js') }}"></script>
+
+<!--  js - leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/leaflet/leaflet_formularios.js') }}"></script>
+
+<!-- js - API normlizacion de direcciones  -->
+<script src="{{ url_for('static', filename='js/script_direcciones.js') }}"></script>
+
+{% endblock scripts %}
