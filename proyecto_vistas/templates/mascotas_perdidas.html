@@ -105,7 +105,7 @@
                     {% endif %}
 
                     <!-- TARJETA MASCOTA {{ mascota['id'] }} -->
-                    <div class="col-4 tarjeta-mascota h-auto" data-nombre="{{ mascota['nombre_mascota'] }}" data-coordx="{{ mascota['coordx'] }}" data-coordy="{{ mascota['coordy'] }}">
+                    <div class="col-4 tarjeta-mascota h-auto" data-nombre="{{ mascota['nombre_mascota'] }}" data-animal="{{ mascota['animal'] }}" data-coordx="{{ mascota['coordx'] }}" data-coordy="{{ mascota['coordy'] }}">
                         <div class="bg-alga d-flex flex-column p-4 m-0 rounded-4 h-100 justify-content-between">
                             <div class="m-0 p-0">
                                 <h3 class="text-light fs-2 fw-medium m-0 lh-sm">{{ mascota['nombre_mascota'] }}</h3>
@@ -212,5 +212,5 @@
     <!--  js - leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="{{ url_for('static', filename='js/leaflet/leaflet_mascotas.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/leaflet.js') }}"></script>
 {% endblock scripts %}
