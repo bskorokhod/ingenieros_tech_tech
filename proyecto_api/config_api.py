@@ -1,3 +1,5 @@
+from validaciones import es_id, es_varchar, es_float, es_telefono, es_fecha, es_bool
+
 # Constantes generales de la API
 NOMBRE_BASE_DATOS = ""
 # Por ahora, hosteamos la BBDD locaclmente
@@ -12,19 +14,40 @@ TABLA_REFUGIOS = "refugios"
 TABLA_REPORTES_REENCUENTRO = "reportes_reencuentro"
 
 # Opciones de valores para los campos correspondientes
-LISTA_RAZAS_ANIMAL = {
-    "perro": ["Labrador Retriever", "Golden Retriever", "Ovejero Aleman", "Bulldog Ingles", "Beagle", "Caniche", "Boxer", "Salchicha", "Husky Siberiano", "Rottweiler", "Yorkshire Terrier", "Chihuahua", "Shih Tzu", "Dobermann", "Cocker Spaniel Ingles", "Pomeranian (Spitz Aleman)", "Bulldog Frances", "Border Collie", "Basset Hound", "Gran Danes", "Dogo Aleman", "Mestizo", "Otro / No se"],
-    "gato": ["Persa", "Siames", "Maine Coon", "Bengala", "Esfinge", "Ragdoll", "British Shorthair", "Azul Ruso", "Abisinio", "Fold escoces (Scottish Fold)", "Exotico de Pelo Corto", "Himalayo", "Devon Rex", "Burmes", "Cornish Rex", "American Shorthair", "Birmano", "Angora Turco", "Bombay", "Tonquines", "Mestizo", "Otro / No se"]
-}
-
 LISTA_SEXOS = ["Macho", "Hembra"]
-
-LISTA_COLORES_ANIMAL = {
-    "perro": ["negro", "blanco", "gris", "marron", "dorado"],
-    "gato": ["negro", "blanco", "gris", "marron", "naranja"]
-}
 
 LISTA_EDADES = ["Cachorro", "Joven", "Adulto"]
 
 # Diccionario Endpoint master
-TABLAS = {} # un Dict o Set con las tablas de la Base de Datos
+TABLAS = {TABLA_ADMIN: {"id": (es_id),
+                        "usuario": (es_varchar, 10),
+                        "contraseña": (es_varchar, 50)},
+          TABLA_ANIMALES_PERDIDOS: {"id": (es_id),
+                                    "nombre_mascota": (es_varchar, 20),
+                                    "animal": (es_varchar, 5),
+                                    "raza": (es_varchar, 30),
+                                    "sexo": (es_varchar, 9),
+                                    "color": (es_varchar, 8),
+                                    "edad": (es_varchar, 9),
+                                    "direccion": (es_varchar, 100),
+                                    "coord_x": (es_float),
+                                    "coord_y": (es_float),
+                                    "fecha_extravio": (es_fecha),
+                                    "telefono_contacto": (es_telefono),
+                                    "nombre_contacto": (es_varchar, 64),
+                                    "info adicional": (es_varchar, 280),
+                                    "encontrado": (es_bool)},
+          TABLA_CARACTERISTICAS_MASCOTAS: {"id": (es_id),
+                                           "animal": (es_varchar, 5),
+                                           "caracteristica": (es_varchar, 5),
+                                           "valor": (es_varchar, 30)},
+          TABLA_REFUGIOS: {"id": (es_id),
+                           "nombre": (es_varchar, 64),
+                           "direccion": (es_varchar, 100),
+                           "coord_x": (es_float),
+                           "coord_y": (es_float),
+                           "telefono": (es_telefono),
+                           "aceptado": (es_bool)},
+          TABLA_REPORTES_REENCUENTRO: {"id reporte": (es_id),
+                                       "id mascota": (es_id),
+                                       "fue_procesado": (es_bool)}}
