@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% set color_fondo = "bg-verde" %}
+{% set color_letras = "txt-crema" %}
+
+<!--numero_error se pasa por parametro en app.py-->
+{% block title %} Error {{ numero_error }}
+{% endblock title %}
+
+<!--dependiendo del error se muestran distintos mensajes de error e imagenes-->
+{% if numero_error == 404 %}
+    {% set informacion = 'Lo sentimos, nuestro perrito no pudo traer la página que buscaba' %}
+    {% set imagen = url_for('static', filename= 'images/perropregunta.png') %}
+{% elif numero_error == 500 %}
+    {% set informacion = 'Lo sentimos, nuestro perrito tuvo problemas y no pudo cumplir su solicitud' %}
+    {% set imagen = url_for('static', filename= 'images/perroengranaje.png') %}
+{% elif numero_error == 400 %}
+    {% set informacion = 'Lo sentimos, nuestro perrito no entendió la solicitud que le pediste' %}
+    {% set imagen = url_for('static', filename= 'images/perroengranaje.png') %}
+{% endif %}
+
+{% block content %}
+  <div class="d-flex flex-column align-items-center {{ color_fondo }} {{ color_letras }}">
+      <h1 class="fw-bold display-4"><i class="fa-solid fa-gear fa-spin fa-spin-reverse"></i> ERROR {{ numero_error }} <i class="fa-solid fa-gear fa-spin fa-spin-reverse"></i></h1>
+      <p class="fs-4">{{ informacion }}</p>
+      <img id="img-perro" class="col-12 col-md-3" src="{{ imagen }}" />
+    </div>
+{% endblock content %}
+

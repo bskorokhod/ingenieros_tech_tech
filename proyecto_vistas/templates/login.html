@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% set color_fondo = 'bg-verde' %}
+{% set color_letras = 'txt-crema' %}
+
+
+{% block content %}
+<main class="d-flex justify-content-center my-5">
+    <div class="bg-white text-center mb-5 px-5 py-4 rounded col-xs-4">
+        <i class="txt-verde fa-solid fa-user-gear fs-1"></i>
+
+        <h1 class="txt-verde fs-3 fw-bold mt-2 mb-4">Ingreso de administrador</h1>
+
+        <form id="formulario-login" class="needs-validation" novalidate action="{{ url_for('login') }}" method="POST">
+            <div class="mb-4 row text-start">
+                <label for="inputUser" class="col-sm-3 col-form-label txt-verde fw-medium fs-6">Usuario</label>
+                <div class="col-sm-9">
+                    <input type="text" id="inputUser" name="username"
+                        class="form-control bg-gris mt-1 h-75 rounded-4 focus-ring-alga" autocomplete="off" required>
+                    <div class="invalid-feedback text-end">Por favor, ingrese su usuario.</div>
+                </div>
+            </div>
+
+            <div class="mb-5 row text-start">
+                <label for="inputPass" class="col-sm-4 col-form-label txt-verde fw-medium fs-6">Contraseña</label>
+                <div class="col-sm-8">
+                    <input type="password" id="inputPass" name="password"
+                        class="form-control bg-gris mt-1 h-75 rounded-4 focus-ring-alga" autocomplete="off" required>
+                    <div class="invalid-feedback text-end">Por favor, ingrese su contraseña.</div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-alga-gris align-self-center col-6 py-2 fs-6 rounded-4">Ingresar</button>
+        </form>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<!-- js - validación login -->
+<script src="{{ url_for('static', filename='js/validacion_login.js') }}"></script>
+{% endblock %}
