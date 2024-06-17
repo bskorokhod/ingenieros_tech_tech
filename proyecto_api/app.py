@@ -13,7 +13,56 @@ app = Flask(__name__)
 @app.route('/master', methods = ['GET','POST','PATCH', 'DELETE'])
 def master():
     
-    # acá se verifica el caso del metodo get
+    if request.method == "GET":
+        
+        """
+        Método GET:
+        Recibe la `tabla` y un `id`, como parámetros en el argumento del endpoint, de la fila 
+        que se quiera recibir.
+
+        POSTCONDICIONES:
+            - Si el `id` es válido, se devuelve un JSON con las columnas de la `tabla` y los 
+            valores correspondientes a la fila del `id`. En caso de que no exista la `tabla` en la Base
+            de datos o `id` no corresponda a ninguna fila, se devuelve un error 400: Bad Request.
+        """
+
+        # Recibo la tabla desde los argumentos
+        tabla = request.args.get("tabla")
+        if tabla not in TABLAS:
+            return jsonify({"mensaje": "Bad request"}), 400
+    
+        # Como el id en TABLA_REPORTES_REENCUENTRO es id_reporte, verifico esto
+        if tabla == TABLA_REPORTES_REENCUENTRO:
+            nombre_id = "id_reporte"
+        else:
+            nombre_id = "id"
+
+        # Selecciono la información de la tabla pedida en la que nombre_id sea el pasado por argumentos
+        query = f"""
+        SELECT * 
+        FROM {tabla} 
+        WHERE {nombre_id} = '{request.args.get(nombre_id)}';"""
+
+        response, codigo_estado = traer_info(query, 200, engine)
+        if codigo_estado != 200:
+            return jsonify({"mensaje": response}), codigo_estado
+        
+        # fetchone() obtiene los valores del primer resultado que encuentre en response (aunque hay uno solo)
+        fila = response.fetchone()
+
+        # Si fila está vacía, entonces el id no correspondía a ninguna fila de la tabla
+        if not fila:
+            return jsonify({"mensaje": "Bad request"}), 400
+        
+        # Creo el diccionario que voy a JSONificar con las columnas y los valores de la fila pedida
+        columnas = response.keys()
+        info_fila = {}
+        i = 0
+        for columna in columnas:
+            info_fila[columna] = fila[i]
+            i += 1
+        
+        return jsonify(info_fila), codigo_estado
     
     if request.method == "DELETE":
         
