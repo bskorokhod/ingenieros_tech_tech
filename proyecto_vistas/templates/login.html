@@ -13,27 +13,29 @@
 
         <h1 class="txt-verde fs-3 fw-bold mt-2 mb-4">Ingreso de administrador</h1>
 
-        <form id="formulario-login" class="needs-validation" novalidate action="{{ url_for('login') }}" method="POST">
+        <form id="formulario-login" class="needs-validation" novalidate action="{{ url_for('admin_config') }}" method="POST">
             <div class="mb-4 row text-start">
-                <label for="inputUser" class="col-sm-3 col-form-label txt-verde fw-medium fs-6">Usuario</label>
+                <label for="inputUsuario" class="col-sm-3 col-form-label txt-verde fw-medium fs-6">Usuario</label>
                 <div class="col-sm-9">
-                    <input type="text" id="inputUser" name="username"
-                        class="form-control bg-gris mt-1 h-75 rounded-4 focus-ring-alga" autocomplete="off" required>
-                    <div class="invalid-feedback text-end">Por favor, ingrese su usuario.</div>
+                    <input type="text" id="inputUsuario" name="usuario" class="form-control bg-gris mt-1 h-80 rounded-4 focus-ring-alga" autocomplete="off" required>
+                    <div class="invalid-feedback text-end">Por favor, ingrese su usuario</div>
                 </div>
             </div>
 
             <div class="mb-5 row text-start">
-                <label for="inputPass" class="col-sm-4 col-form-label txt-verde fw-medium fs-6">Contraseña</label>
+                <label for="inputContraseña" class="col-sm-4 col-form-label txt-verde fw-medium fs-6">Contraseña</label>
                 <div class="col-sm-8">
-                    <input type="password" id="inputPass" name="password"
-                        class="form-control bg-gris mt-1 h-75 rounded-4 focus-ring-alga" autocomplete="off" required>
-                    <div class="invalid-feedback text-end">Por favor, ingrese su contraseña.</div>
+                    <input type="password" id="inputContraseña" name="contraseña" class="form-control bg-gris mt-1 h-80 rounded-4 focus-ring-alga" autocomplete="off" required>
+                    <div class="invalid-feedback text-end">Por favor, ingrese su contraseña</div>
                 </div>
             </div>
 
             <button type="submit" class="btn-alga-gris align-self-center col-6 py-2 fs-6 rounded-4">Ingresar</button>
         </form>
+
+        <div class="{{ 'd-none' if not fallido }}">
+            <p class="text-danger fs-5 mt-3">Usuario o contraseña incorrectos</p>
+        </div>
     </div>
 </main>
 {% endblock %}
