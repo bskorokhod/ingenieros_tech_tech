@@ -33,14 +33,8 @@ def login_admin():
     try:
         with engine.connect() as conn:
             
-            try: 
-                data = request.get_json(force=True)
-            except:
-                return jsonify({'code': 0})
-            
-        
-            user = data.get('user')
-            password = data.get('password')
+            user = request.args.get('user')
+            password = request.args.get('password')
 
             response = conn.execute(text(f"SELECT * FROM admin WHERE usuario = '{user}' AND contrasena = '{password}'"))
             
