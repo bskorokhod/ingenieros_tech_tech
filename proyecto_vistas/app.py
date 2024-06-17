@@ -238,14 +238,6 @@ def aceptado(formulario):
 
     return render_template("aceptado.html", form=formulario)
 
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('base_errores.html', numero_error=404), 404
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('base_errores.html', numero_error=500), 500
-
 @app.route('/perdido', methods=['GET', 'POST'])
 def perdido():
     if request.method == 'POST':
@@ -305,6 +297,18 @@ def encontrado():
         return internal_server_error(e=datos_mascotas.status_code)
 
     return render_template('mascotas_perdidas.html', caracteristicas = caracteristicas_animales, mascotas = mascotas_perdidas)
+
+@app.errorhandler(400)
+def bad_request(e):
+    return render_template('base_errores.html', numero_error=400), 400
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('base_errores.html', numero_error=404), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('base_errores.html', numero_error=500), 500
 
 if __name__ == '__main__':
     app.run(port=PUERTO_APP)
