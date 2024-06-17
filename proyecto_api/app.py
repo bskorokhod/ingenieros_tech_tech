@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from queries import traer_info, realizar_cambios, realizar_query_validacion
-from config_api import CONECTOR_SQL, PUERTO_API, TABLA_ADMIN, TABLA_ANIMALES_PERDIDOS, TABLA_CARACTERISTICAS_MASCOTAS, TABLA_REFUGIOS, TABLA_REPORTES_REENCUENTRO, TABLAS
-from validaciones import es_id, es_fecha, es_float, es_telefono, es_varchar, es_admin, es_animal_perdido, es_caracteristica_mascota, es_refugio
+from config_api import CONECTOR_SQL, PUERTO_API, TABLA_ADMIN, TABLA_ANIMALES_PERDIDOS, TABLA_CARACTERISTICAS_MASCOTAS, TABLA_REFUGIOS, TABLA_REPORTES_REENCUENTRO
+from validaciones import es_id, es_fecha, es_float, es_telefono, es_varchar, es_admin, es_animal_perdido, es_caracteristica_mascota, es_refugio, TABLAS
 
 engine = create_engine(CONECTOR_SQL)
 
@@ -15,22 +15,23 @@ def master():
     
     # acá se verifica el caso del metodo get
     
-    # Si llega acá, método != GET
-    body = request.get_json()
-    tabla = body.get("tabla")
-
-    if tabla not in TABLAS:
-        return jsonify({"mensaje":"Bad request"}), 400
-    
     if request.method == "DELETE":
+        
+        tabla = request.args.get("tabla")
+        id_a_eliminar = request.args.get("id", -1)
+
+        
+        if tabla not in TABLAS or id_a_eliminar == -1:
+            return jsonify({"mensaje":"Bad request"}), 400
+        
+        
         if tabla == "reportes_reencuentro":
-            nombre_id = "id_reporte"
+            nombre_id = "id_reporte"    
         else:
             nombre_id="id"
-        if nombre_id not in body:
-                return jsonify({"mensaje":"Bad request"}), 400
-        id_a_eliminar = body[nombre_id]
-        query_validacion = f"SELECT * FROM {tabla} WHERE '{nombre_id}' = {id_a_eliminar};"
+        
+        query_validacion = f"SELECT * FROM `{tabla}` WHERE `{nombre_id}` = {id_a_eliminar};"
+        
         validacion = realizar_query_validacion(query_validacion, engine)
 
         if validacion == -1 : 
@@ -38,10 +39,60 @@ def master():
         if validacion == 0:
             return jsonify({"mensaje":"Bad request"}), 400
         
-        query = f"DELETE FROM {tabla} WHERE '{nombre_id}' = {id_a_eliminar};" 
+        query = f"DELETE FROM `{tabla}` WHERE `{nombre_id}` = {id_a_eliminar};" 
 
         resultado, codigo = realizar_cambios(query, 200, engine)
+        
         return jsonify({"mensaje":resultado}), codigo
+    
+    
+    # Si llega acá, método != GET y  metodo != DELETE
+    body = request.get_json()
+    tabla = body.get("tabla")
+
+    if tabla not in TABLAS:
+        return jsonify({"mensaje":"Bad request"}), 400
+    
+    
+    if request.method == "POST":
+
+        
+        if tabla == TABLA_ANIMALES_PERDIDOS:
+            columnas = list(TABLAS.get(TABLA_ANIMALES_PERDIDOS).keys())
+            if not es_animal_perdido(body):
+                return jsonify({"mensaje" : "Bad request"}), 400
+        elif tabla == TABLA_REFUGIOS:
+            columnas = list(TABLAS.get(TABLA_REFUGIOS).keys())
+            if not es_refugio(body):
+                return jsonify({"mensaje" : "Bad request"}), 400
+        elif tabla == TABLA_ADMIN:
+            columnas = list(TABLAS.get(TABLA_ADMIN).keys())
+            if not es_admin(body):
+                return jsonify({"mensaje" : "Bad request"}), 400
+        else:
+            columnas = list(TABLAS.get(TABLA_CARACTERISTICAS_MASCOTAS).keys())
+            if not es_caracteristica_mascota(body):
+                return jsonify({"mensaje" : "Bad request"}), 400
+
+        claves = []
+        valores = []
+        
+        for clave, valor in body.items():
+            if clave not in columnas:
+                continue
+            claves.append(clave)
+            valores.append(f"'{valor}'")
+        
+        claves = ",".join(claves)
+        valores = ",".join(valores)
+        
+        query = f"INSERT INTO {tabla} ({claves}) VALUES ({valores});"
+        
+        resultado, codigo = realizar_cambios(query, 200, engine)
+        
+        return jsonify({"mensaje" : resultado}), codigo
+    
+    
     
     if request.method == "PATCH":
 
@@ -65,22 +116,17 @@ def master():
             return jsonify({"mensaje": "Bad request"}), 400
 
 
-        query_modificacion = f"UPDATE {tabla} SET "
-
+        query_modificacion = f"UPDATE `{tabla}` SET "
 
         for clave, valor in body.items():
-
             if clave in columnas_tabla and clave != clave_unica_tabla:
 
                 funcion_auxiliar = columnas_tabla.get(clave)[0]
 
                 if funcion_auxiliar is es_varchar:
-
                     argumento_funcion = columnas_tabla.get(clave)[1]
-
                     if funcion_auxiliar(valor, argumento_funcion):
-
-                        query_modificacion += f"{clave} = {valor}, "
+                        query_modificacion += f"`{clave}` = '{valor}', "
 
                     else:
 
@@ -95,11 +141,12 @@ def master():
 
                         return jsonify({"error": f"{clave}'value ({valor}) does not fit the requierements"}), 400
                     
+        query_modificacion = query_modificacion[:-2] + f" WHERE `{tabla}`.`{clave_unica_tabla}` = {valor_clave_unica};"
+
+        #query_modificacion = "UPDATE `animales_perdidos` SET `nombre_mascota` = 'Marco' WHERE `animales_perdidos`.`id` = 72;"
         
-        query_modificacion = query_modificacion[:-2] + f" WHERE {clave_unica_tabla} = {valor_clave_unica};"
-
-
-        return realizar_cambios(query_modificacion, 200, engine)
+        resultado, codigo  = realizar_cambios(query_modificacion, 200, engine)
+        return jsonify({"mensaje": resultado}), codigo
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=PUERTO_API)
