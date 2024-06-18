@@ -3,6 +3,96 @@
 # ingenieros_tech_tech
 Repositorio para el TP Integral de la materia Introducción al Desarrollo de Software de la Facultad de Ingeniería de la Universidad de Buenos Aires.
 
+## Endpoint /caracteristicas_mascotas
+Sólo admite requests de método `GET` sin parámetros.
+
+### Query
+```sql
+SELECT * FROM caracteristicas_mascotas ORDER BY
+    CASE
+        WHEN valor = 'Otro / No se' THEN 1
+        ELSE 0
+    END,
+valor;
+```
+
+Cuando se accede al endpoint éste envía la query a la BBDD.
+
+Si la solicitud da error se devuelve el código de error junto al mensaje de error.
+Si es correcta se recibe una respuesta sobre cuyas filas se itera para armar un diccionario del siguiente estilo:
+
+```py
+{
+    "gato": {
+        "color": [
+            "blanco",
+            "gris",
+            "marron",
+            "naranja",
+            "negro"
+        ],
+        "raza": [
+            "Abisinio",
+            "American Shorthair",
+            "Angora Turco",
+            "Azul Ruso",
+            "Bengala",
+            "Birmano",
+            "Bombay",
+            "British Shorthair",
+            "Burmes",
+            "Cornish Rex",
+            "Devon Rex",
+            "Esfinge",
+            "Exotico de Pelo Corto",
+            "Fold escoces (Scottish Fold)",
+            "Himalayo",
+            "Maine Coon",
+            "Mestizo",
+            "Persa",
+            "Ragdoll",
+            "Siames",
+            "Tonquines",
+            "Otro / No se"
+        ]
+    },
+    "perro": {
+        "color": [
+            "blanco",
+            "dorado",
+            "gris",
+            "marron",
+            "negro"
+        ],
+        "raza": [
+            "Basset Hound",
+            "Beagle",
+            "Border Collie",
+            "Boxer",
+            "Bulldog Frances",
+            "Bulldog Ingles",
+            "Caniche",
+            "Chihuahua",
+            "Cocker Spaniel Ingles",
+            "Dobermann",
+            "Dogo Aleman",
+            "Golden Retriever",
+            "Gran Danes",
+            "Husky Siberiano",
+            "Labrador Retriever",
+            "Mestizo",
+            "Ovejero Aleman",
+            "Pomeranian (Spitz Aleman)",
+            "Rottweiler",
+            "Salchicha",
+            "Shih Tzu",
+            "Yorkshire Terrier",
+            "Otro / No se"
+        ]
+    }
+}
+```
+
 ## Endpoint /mascotas_perdidas
 
 ### Descripción
@@ -537,3 +627,61 @@ Donde tabla es el nombre de la tabla en la base de datos y los demás campos son
 #### Errores en el Endpoint
 
 En caso de que ocurra un error en la conexión con la BBDD, se retorna un JSON con la causa o causas del error y el código de estado `500`.
+
+### PATCH
+
+#### Datos recibidos
+Se espera que la request tenga un JSON con al menos 3 claves (`tabla`, `<clave única de la tabla>` y `<columna que se quiere modificar>`) y un máximo de la cantidad de columnas que tiene la tabla + 1.
+
+#### Dependencia
+Para que el endpoint pueda identificar cuáles son los nombres de las columnas de cada tabla y el tipo de validación que debe hacerse sobre cada una utiliza una constante `TABLAS`, importada de `validaciones.py`. En ella se encuentran mencionadas las funciones que deben ejecutarse sobre los valores recibidos por /master (método PATCH) para validarlos. También se indica, en los casos que las funciones auxiliares requieran un argumento adicional el valor de dicho argumento.
+```py
+TABLAS = {TABLA_ADMIN: {"id": (es_id, 0),
+                        "usuario": (es_varchar, 10),
+                        "contrasena": (es_varchar, 50)},
+          TABLA_ANIMALES_PERDIDOS: {"id": (es_id, 0),
+                                    "nombre_mascota": (es_varchar, 20),
+                                    "animal": (es_varchar, 5),
+                                    "raza": (es_varchar, 30),
+                                    "sexo": (es_varchar, 9),
+                                    "color": (es_varchar, 8),
+                                    "edad": (es_varchar, 9),
+                                    "direccion": (es_varchar, 100),
+                                    "coordx": (es_float, 0),
+                                    "coordy": (es_float, 0),
+                                    "fecha_extravio": (es_fecha, 0),
+                                    "telefono_contacto": (es_telefono, 0),
+                                    "nombre_contacto": (es_varchar, 64),
+                                    "info adicional": (es_varchar, 280),
+                                    "encontrado": (es_bool, 0)},
+          TABLA_CARACTERISTICAS_MASCOTAS: {"id": (es_id, 0),
+                                           "animal": (es_varchar, 5),
+                                           "caracteristica": (es_varchar, 5),
+                                           "valor": (es_varchar, 30)},
+          TABLA_REFUGIOS: {"id": (es_id, 0),
+                           "nombre": (es_varchar, 64),
+                           "direccion": (es_varchar, 100),
+                           "coordx": (es_float, 0),
+                           "coordy": (es_float, 0),
+                           "telefono": (es_telefono, 0),
+                           "aceptado": (es_bool, 0)},
+          TABLA_REPORTES_REENCUENTRO: {"id_reporte": (es_id, 0),
+                                       "id_mascota": (es_id, 0),
+                                       "fue_procesado": (es_bool, 0)}}
+```
+#### Queries
+Una vez recibidos los datos se valida la clave única dentro del JSON y se envía una query de validación con la función auxiliar de `realizar_query_validacion()` a la tabla correspondiente para corroborar la existencia de la fila que se desea modificar.
+```sql
+SELECT {clave_unica_tabla} FROM {tabla} WHERE id = {valor_clave_unica};
+```
+> Si la fila no existe o la query da error se devuelven los mensajes y códigos de error pertinentes.
+
+Si la solicitud al a BBDD es exitosa se procede a armar una segunda query de modificación de forma dinámica: se va iterando sobre las claves y valores del JSON recibido y se valida que los que no son `tabla` ni `<clave única de la tabla>` se correspondan con alguna de las columnas de la constante `TABLA.get(tabla)`.
+1. Si se corresponden se valida el valor de esas claves con las funciones auxiliares de `validaciones.py` y, de ser válido, se añade dicha modificación a la query de modificación. De no ser válidos se devuelve el error pertinente.
+2. Si no se corresponden se ignoran.
+
+Por ejemplo:
+```sql
+UPDATE `{tabla}` SET `{clave1}` = '{valor1}', `{claven}` = '{valorn}' WHERE `{tabla}`.`{clave_unica_tabla}` = {valor_clave_unica};
+```
+> Si la solicitud es exitosa se devuelven el mensaje y código de estado pertinentes.
