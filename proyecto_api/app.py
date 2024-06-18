@@ -47,141 +47,235 @@ def login_admin():
 
 @app.route('/reportes_reencuentro', methods=['GET', 'POST', 'PATCH', 'PUT'])
 def reportes_reencuentro():
+    """
+    Servicio para gestionar reportes de reencuentros de mascotas perdidas.
+
+    Métodos HTTP soportados:
+
+    1. GET:
+        Obtiene una lista paginada de reportes de reencuentros de mascotas perdidas que no han sido procesados.
+
+        - PARÁMETROS DE QUERY: 
+            - pag_reportes (int, opcional): Número de la página que se desea obtener (por defecto: 1).
+            - limite_reportes (int, opcional): Número de reportes a mostrar por página (por defecto: 5).
+
+        - POSTCONDICIONES: 
+            - Si la consulta fue exitosa, el servicio devuelve una tupla que contiene un JSON con los los
+            reportes de reencuentro junto con una indicación de si hay más páginas disponibles; y el código de estado 200
+            - Ejemplo de respuesta exitosa:
+                ```
+                {
+                    "hay_pag_siguiente": true,
+                    "reportes_reencuentro": {
+                        "1": {
+                            "direccion": "Calle Defensa 1234",
+                            "fecha_extravio": "01/05/2024",
+                            "id_mascota": 1,
+                            "nombre_contacto": "María Gómez",
+                            "nombre_mascota": "Luna",
+                            "telefono_contacto": "01112345678"
+                        }
+                }
+                ```
+            - Si ocurre un error al ejecutar la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error 
+            y el código de estado 500
+
+    2. POST:
+        Agrega un nuevo registro a la tabla reportes_reencuentro.
+
+        - PRECONDICIONES: 
+            - En el body de la solicitud debe enviarse un JSON con el id(int) de la mascota reportada
+
+        - POSTCONDICIONES: 
+            - Inserta un nuevo registro en la tabla reportes_reencuentro si la mascota existe y está perdida.
+            - Si la consulta fue exitosa, el servicio devuelve una tupla que contiene un JSON con un mensaje de éxito y el código de 
+            estado 201.
+            - Si los datos enviados no son válidos, el servicio devuelve una tupla que contiene un JSON con un mensaje de error y el código 
+            de estado 400.
+            - Si ocurre un error al realizar la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error y el código 
+            de estado 500.
+
+    3. PATCH:
+        Modifica el estado de procesamiento de un reporte de reencuentro descartado.
+
+        - PRECONDICIONES: 
+            - En el body de la solicitud debe enviarse un JSON con el id(int) del reporte de reencuentro descartado.
+        
+        - POSTCONDICIONES: 
+            - Actualiza el campo fue_procesado a TRUE para el reporte especificado.
+            - Si los datos enviados no son válidos, el servicio devuelve una tupla que contiene un JSON con un mensaje de error y el código 
+            de estado 400.
+            - Si ocurre un error al realizar la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error y el código 
+            de estado 500.
+
+    4. PUT:
+        Actualiza el estado de una mascota encontrada y marca los reportes de reencuentro correspondientes como procesados.
+
+        - PRECONDICIONES: 
+            - En el body de la solicitud debe enviarse un JSON con el id(int) de la mascota encontrada.
+        
+        - POSTCONDICIONES: 
+            - Actualiza el campo encontrado a TRUE en la tabla animales_perdidos para la mascota especificada.
+            - Actualiza el campo fue_procesado a TRUE en la tabla reportes_reencuentro para los reportes correspondientes.
+            - Si los datos enviados no son válidos, el servicio devuelve una tupla que contiene un JSON con un mensaje de error y el código 
+            de estado 400.
+            - Si ocurre un error al realizar la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error y el código 
+            de estado 500.
+    """
+
     if request.method == 'GET':
-        try:
-            with engine.connect() as conexion:
-                # Trae de la BBDD los datos de las mascotas que corresponden a los reportes de reencuentro sin procesar
-                query = """SELECT * FROM reportes_reencuentro WHERE fue_procesado = FALSE;"""
-                
-                response_reportes_reencuentro = conexion.execute(text(query))
+        # Obtenengo el limite y la página actual de los parámetros de consulta
+        pagina = request.args.get('pag_reportes', default=1, type=int)
+        elementos = request.args.get('limite_reportes', default=5, type=int)
+        
+        reportes_query = f"""
+                        SELECT * FROM {TABLA_REPORTES_REENCUENTRO} 
+                        WHERE fue_procesado = FALSE
+                        ORDER BY id_reporte
+                        LIMIT {elementos} OFFSET {(pagina - 1) * elementos};
+                        """
+        validacion_pagina = f"""
+                            SELECT * FROM {TABLA_REPORTES_REENCUENTRO} 
+                            WHERE fue_procesado = FALSE
+                            ORDER BY id_reporte
+                            LIMIT 1 OFFSET {pagina * elementos};
+                            """
 
-                mascotas_encontradas = {}
-                for reporte in response_reportes_reencuentro:
-                    with engine.connect() as conexion:
-                        query = f"""SELECT nombre_mascota, direccion, fecha_extravio, telefono_contacto, nombre_contacto
-                                FROM animales_perdidos
-                                WHERE id = {reporte.id_mascota};"""
-                        datos_mascotas = conexion.execute(text(query))
-                        for datos_mascota in datos_mascotas:        
-                            mascotas_encontradas[reporte.id_reporte] = {
-                                'id_mascota': reporte.id_mascota,
-                                'nombre_mascota': datos_mascota.nombre_mascota,
-                                'direccion': datos_mascota.direccion,
-                                'fecha_extravio': datos_mascota.fecha_extravio,
-                                'telefono_contacto': datos_mascota.telefono_contacto,
-                                'nombre_contacto': datos_mascota.nombre_contacto
-                            }
+        resultado_reportes_reencuentro, reportes_codigo = traer_info(reportes_query, 200, engine)
 
-                return jsonify(mascotas_encontradas), 200
+        if reportes_codigo == 500:
+            return jsonify(resultado_reportes_reencuentro), reportes_codigo
+        
+        mascotas_encontradas = {}
+        for reporte in resultado_reportes_reencuentro:
+            mascotas_query = f"""
+                            SELECT nombre_mascota, direccion, fecha_extravio, telefono_contacto, nombre_contacto
+                            FROM {TABLA_ANIMALES_PERDIDOS}
+                            WHERE id = {reporte.id_mascota};
+                            """
+            datos_mascotas, mascotas_codigo = traer_info(mascotas_query, 200, engine)
 
-        except SQLAlchemyError as err:
-            return jsonify(str(err.__cause__)), 500 
+            if mascotas_codigo == 500:
+                return jsonify(datos_mascotas), mascotas_codigo
+            
+            for datos_mascota in datos_mascotas:
 
-    elif request.method == 'POST':
-        datos_mascota = request.get_json()
-        id_mascota = datos_mascota.get('id')
+                # Construyo el diccionario con los datos de la mascota asociadas al reporte
+                mascotas_encontradas[reporte.id_reporte] = {
+                    'id_mascota': reporte.id_mascota,
+                    'nombre_mascota': datos_mascota.nombre_mascota,
+                    'direccion': datos_mascota.direccion,
+                    'fecha_extravio': datos_mascota.fecha_extravio.strftime("%d/%m/%Y"),
+                    'telefono_contacto': datos_mascota.telefono_contacto,
+                    'nombre_contacto': datos_mascota.nombre_contacto
+                }
 
-        if not id_mascota:
-            return jsonify({"mensaje": "No se envio ningun id de mascota"}), 400
+        resultado_validacion_pagina = realizar_query_validacion(validacion_pagina, engine)
+        if resultado_validacion_pagina == -1:
+            return jsonify({'mensaje': "Error al validar"}), 500
+        elif resultado_validacion_pagina == 0:
+            return jsonify({'reportes_reencuentro': mascotas_encontradas, 'hay_pag_siguiente': False}), 200
+        else:
+            return jsonify({'reportes_reencuentro': mascotas_encontradas, 'hay_pag_siguiente': True}), 200
+
+    # Si llega a este punto, es porque el método HTTP es POST, PATCH o PUT por lo que necesariamente recibe un JSON
+    datos = request.get_json()
+
+    if request.method == 'POST':
+        id_mascota = datos.get('id')
+        
+        if not es_id(id_mascota):
+            return jsonify({"mensaje": "El id de la mascota es inválido"}), 400
+
+        id_mascota = int(id_mascota)
 
         # Agrega un nuevo registro a la tabla reportes_reencuentro
-        query = f"""INSERT INTO reportes_reencuentro (id_mascota) 
+        query = f"""INSERT INTO {TABLA_REPORTES_REENCUENTRO} (id_mascota) 
                     VALUES ('{id_mascota}');"""
 
         # Valida que la mascota asociada al id_mascota exista y se encuentre perdida
         validacion_mascota = f"""SELECT * 
-                                FROM animales_perdidos
+                                FROM {TABLA_ANIMALES_PERDIDOS}
                                 WHERE id = {id_mascota} AND encontrado = FALSE;"""
 
-        try:
-            with engine.begin() as conexion:
-                resultado_validacion = conexion.execute(text(validacion_mascota))
-                if resultado_validacion.rowcount != 0:
-                    conexion.execute(text(query))
-                    # Al usar engine.begin() se realiza engine.commit() implícitamente
-                else:
-                    return jsonify({'mensaje': "No existe ninguna mascota perdida asociada a ese id"}), 400
-
-            return jsonify({'mensaje': "Los datos se agregaron correctamente"}), 201
-
-        except SQLAlchemyError as err:
-            return jsonify(str(err.__cause__)), 500
+        resultado_validacion = realizar_query_validacion(validacion_mascota, engine)
+        if resultado_validacion == -1:
+            return jsonify({'mensaje': "Error al validar"}), 500
+        elif resultado_validacion == 0:
+            return jsonify({'mensaje': "No existe ninguna mascota perdida asociada a ese id"}), 400
+        else:
+            resultado, codigo = realizar_cambios(query, 201, engine)
+            return jsonify(resultado), codigo
         
     elif request.method == 'PATCH':
-        reporte_rechazado = request.get_json()
-        id_reporte_rechazado = reporte_rechazado.get('id_reporte')
+        id_reporte_rechazado = datos.get('id_reporte')
 
-        if not id_reporte_rechazado:
-            return jsonify({"mensaje": "No se envio ningun id de reporte"}), 400
+        if not es_id(id_reporte_rechazado):
+            return jsonify({"mensaje": "El id del reporte es inválido"}), 400
+
+        id_reporte_rechazado = int(id_reporte_rechazado)
 
         # Modifica el estado de procesamiento de un reporte que haya sido descartado
-        query = f"""UPDATE reportes_reencuentro 
+        query = f"""UPDATE {TABLA_REPORTES_REENCUENTRO} 
                     SET fue_procesado = TRUE 
                     WHERE id_reporte = {id_reporte_rechazado};"""
 
         # Valida la existencia de un reporte de reencuentro asociado a ese id       
         validacion_reporte = f"""SELECT * 
-                                FROM reportes_reencuentro
+                                FROM {TABLA_REPORTES_REENCUENTRO}
                                 WHERE id_reporte = {id_reporte_rechazado};"""
 
-        try:
-            with engine.begin() as conexion:
-                resultado_validacion = conexion.execute(text(validacion_reporte))
-                if resultado_validacion.rowcount != 0:
-                    conexion.execute(text(query))
-                else:
-                    return jsonify({'mensaje': "No existe ningun reporte de reencuentro asociado a ese id"}), 400
-            
-            return jsonify({'mensaje': "El registro se ha modificado correctamente"}), 200
-        
-        except SQLAlchemyError as err:
-            return jsonify(str(err.__cause__)), 500
+        resultado_validacion = realizar_query_validacion(validacion_reporte, engine)
+        if resultado_validacion == -1:
+            return jsonify({'mensaje': "Error al validar"}), 500
+        elif resultado_validacion == 0:
+            return jsonify({'mensaje': "No existe ningun reporte de reencuentro asociado a ese id"}), 400
+        else:
+            resultado, codigo = realizar_cambios(query, 200, engine)
+            return jsonify(resultado), codigo
     
     elif request.method == 'PUT':
-        mascota_encontrada = request.get_json()
-        id_mascota_encontrada = mascota_encontrada.get('id_mascota')
+        id_mascota_encontrada = datos.get('id_mascota')
 
-        if not id_mascota_encontrada:
-            return jsonify({"mensaje": "No se envio ningun id de mascota"}), 400
+        if not es_id(id_mascota_encontrada):
+            return jsonify({"mensaje": "El id de la mascota es inválido"}), 400
 
-        # Modifica el estado de procesamiento de un reporte que haya sido aprobado 
-        reportes_query = f"""UPDATE reportes_reencuentro 
-                            SET fue_procesado = TRUE 
-                            WHERE id_mascota = {id_mascota_encontrada};"""
+        id_mascota_encontrada = int(id_mascota_encontrada)
 
         # Modifica el valor del campo encontrado en la tabla animales_perdidos asociado a la mascota encontrada
-        animales_query = f"""UPDATE animales_perdidos
+        animales_query = f"""UPDATE {TABLA_ANIMALES_PERDIDOS}
                             SET encontrado = TRUE 
                             WHERE id = {id_mascota_encontrada};"""
 
+        # Modifica el estado de procesamiento de un reporte que haya sido aprobado 
+        reportes_query = f"""UPDATE {TABLA_REPORTES_REENCUENTRO} 
+                            SET fue_procesado = TRUE 
+                            WHERE id_mascota = {id_mascota_encontrada};"""
+
         # Valida que la mascota asociada al id_mascota_encontrada exista y esté perdida
-        validacion_animales_query = f"""SELECT * 
-                                        FROM animales_perdidos
-                                        WHERE id = {id_mascota_encontrada} AND encontrado = FALSE;"""
+        validacion_animales = f"""SELECT * 
+                                FROM {TABLA_ANIMALES_PERDIDOS}
+                                WHERE id = {id_mascota_encontrada} AND encontrado = FALSE;"""
 
         # Valida que la mascota asociada al id_mascota_encontrada haya sido reportada como encontrada
-        validacion_reportes_query = f"""SELECT * 
-                                        FROM reportes_reencuentro
-                                        WHERE id_mascota = {id_mascota_encontrada} AND fue_procesado = FALSE;"""
+        validacion_reportes = f"""SELECT * 
+                                FROM {TABLA_REPORTES_REENCUENTRO}
+                                WHERE id_mascota = {id_mascota_encontrada} AND fue_procesado = FALSE;"""
 
-        try:
-            with engine.begin() as conexion:
+        resultado_validacion_animales = realizar_query_validacion(validacion_animales, engine)
+        resultado_validacion_reportes = realizar_query_validacion(validacion_reportes, engine)
 
-                resultado_validacion_animales = conexion.execute(text(validacion_animales_query))
-                if resultado_validacion_animales.rowcount == 0:
-                    return jsonify({'mensaje': "No existe ninguna mascota perdida asociada a ese id"}), 400                
-                
-                resultado_validacion_reportes = conexion.execute(text(validacion_reportes_query))
-                if resultado_validacion_reportes.rowcount == 0:
-                    return jsonify({'mensaje': "No existe ningun reporte de reencuentro vigente asociado a esa mascota"}), 400
-                
-                conexion.execute(text(reportes_query))
-                conexion.execute(text(animales_query))
+        if resultado_validacion_animales == -1 or resultado_validacion_reportes == -1:
+            return jsonify({'mensaje': "Error al validar"}), 500
+        elif resultado_validacion_animales == 0 or resultado_validacion_reportes == 0:
+            return jsonify({'mensaje': "Bad Request"}), 400       
+        else:
+            resultado_animales, codigo_animales = realizar_cambios(animales_query, 200, engine)
+            if codigo_animales == 500:
+                return jsonify(resultado_animales), codigo_animales
 
-            return jsonify({'mensaje': "El registro se ha modificado correctamente"}), 200
-
-        except SQLAlchemyError as err:
-            return jsonify(str(err.__cause__)), 500
+            resultado_reportes, codigo_reportes = realizar_cambios(reportes_query, 200, engine)
+            return jsonify(resultado_reportes), codigo_reportes
 
 
 @app.route('/mascotas_perdidas', methods=["GET", "POST"])
