@@ -186,23 +186,27 @@ def admin_config():
     return redirect(url_for("login"))
 
 
-@app.route('/refugios')
+@app.route('/refugios', methods=["GET",'POST'])
 def refugios():
     
-    try:
-        response = requests.get(HOST_API + ENDPOINT_API_REFUGIO, json={}) # Mando un json vacio xq asi me lo solicitan para poder diferencia dos metodos GET
+    try:          
+        pagina = request.form.get('pagina', 1, type=int)
+        response = requests.get(HOST_API + ENDPOINT_API_REFUGIO, params={'pagina': pagina, 'elementos': LIMITE_REFUGIOS, 'aceptado': 'TRUE'})
         
-        refugios = response.json()
+        response = response.json()
         
-        if response.status_code == 200:
-            return render_template('refugios.html', refugios={'refugios': refugios})
+        hay_siguiente_pagina = response.get("hay_pag_siguiente", False)
         
-        return internal_server_error(response.status_code)
+        refugios = response.get("refugios", [])
+        
+        hay_pagina_anterior = int(pagina) > 1
+        
+        return render_template('refugios.html', refugios=refugios, hay_pagina_siguiente=hay_siguiente_pagina, hay_pagina_anterior=hay_pagina_anterior, pagina=pagina)
 
     except requests.exceptions.HTTPError as e:
-        return internal_server_error(e)
+        return internal_server_error(e=500)
     except requests.exceptions.RequestException as e:
-        return internal_server_error(e)
+        return internal_server_error(e=500)
 
 
 @app.route('/agregar_refugio', methods=['GET', 'POST'])
