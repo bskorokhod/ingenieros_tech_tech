@@ -1,15 +1,3 @@
-#map{
-    height: 50vh;
-}
-
-button[name='btnVerMas']:hover{
-    background-color: #EEF152 !important;
-}
-
-.modal svg{
-    width: 40%;
-}
-
 .btn-pag{
     height: 7vh;
     width: 7vh;
@@ -17,5 +5,10 @@ button[name='btnVerMas']:hover{
 
 #pagination button:disabled, button[disabled]{
     background-color: #87a922;
+    opacity: 0.5;
+}
+
+#paginacion button:disabled, button[disabled]{
+    background-color: #FEA724;
     opacity: 0.5;
 }

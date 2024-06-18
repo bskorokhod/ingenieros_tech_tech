@@ -6,31 +6,32 @@
 {% block styles %} <link rel="stylesheet" href="{{ url_for('static', filename= 'css/styles_home.css') }}"/> {% endblock %}
 {% block content %}
     <div id="main" class="d-flex justify-content-start ">
-        <div class="align-items-start d-flex flex-column container justify-content-end px-0" id="botonera">
-            <a class="fs-3 btn-lg btn btn-success border-0 bg-verde rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('perdido') }}">Buscar a mi mascota</a>
-            <a class="fs-3 btn-lg btn btn-success border-0 bg-alga rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('encontrado') }}">Encontré una mascota</a>
-            <a class="fs-3 btn-lg btn btn-warning border-0 bg-naranja text-light rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('agregar_refugio') }}">Tengo un refugio</a>
+        <div class="align-items-start d-flex col-8 col-md-12 flex-column container justify-content-md-end justify-content-center px-0" id="botonera">
+            <a class="fs-3 btn-md-lg btn btn-success border-0 lh-1 bg-verde rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('perdido') }}">Buscar a mi mascota</a>
+            <a class="fs-3 btn-md-lg btn btn-success border-0 lh-1 bg-alga rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('encontrado') }}">Encontré una mascota</a>
+            <a class="fs-3 btn-md-lg btn btn-warning border-0 lh-1 bg-naranja text-light rounded-4 mb-4 px-5 py-3 text-center" href="{{ url_for('agregar_refugio') }}">Tengo un refugio</a>
         </div>
     </div>
     <div class="p-5 pb-1 bg-alga text-center">
         <h2 class="text-light mb-4">Reencontrando familias y mascotas</h2>
-        <div class="d-flex justify-content-around bg-crema rounded-pill container align-items-center py-4">
+        <div class="d-flex flex-column flex-md-row justify-content-around bg-crema rounded-pill container align-items-center py-4">
             <i class="fa-solid fa-shield-dog txt-verde display-1 mx-3"></i>
-            <p class="d-flex allign-self-center m-auto text-break">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fringilla consequat nunc a blandit.owrvnowjnvjrnvojwrnvojrwvnownvoewnvoewnouwnvonrvornouwrnvovnovwrnvowrnvouwrnvoruwnvouwngubroubvow</p>
+            <p class="d-flex allign-self-center m-auto text-break px-md-5 px-4">En Patitas Perdidas trabajamos sin cesar para reunir a mascotas perdidas con sus familias en el AMBA. Comprendemos la angustia de perder a un miembro peludo del hogar y ofrecemos herramientas para reportar mascotas perdidas o buscar animales encontrados. También colaboramos con refugios para brindarles un hogar.</br>
+                ¡Invitamos a todos a unirse a nuestra misión de amor y cuidado por los animales!</p>
             <i class="fa-solid fa-shield-cat txt-verde display-1 mx-3"></i>
         </div>
-        <div class="my-4 d-flex justify-content-around container" id="testimonios">
-            <div class="text-center col-4">
+        <div class="my-4 d-flex justify-content-around container flex-column flex-md-row" id="testimonios">
+            <div class="text-center col-md-4 col-12 ">
                 <img src="{{ url_for('static', filename = 'images/animal_1.jpg') }}" alt="Feature 1" class="rounded-circle my-4 object-fit-cover">
                 <p class="text-light m-auto">"Lucas vio a Churrasquito por la calle y nos llamó... Super agradecidos con esta red"</p>
                 <p class="txt-gris m-auto">Benjamín - Nuñez CABA</p>
             </div>
-            <div class="text-center col-4">
+            <div class="text-center col-md-4 col-12">
                 <img src="{{ url_for('static', filename = 'images/animal_2.jpg') }}" alt="Feature 2" class="rounded-circle my-4 object-fit-cover">
                 <p class="text-light m-auto">"Encontramos a Chad estábamos desesperados"</p>
                 <p class="txt-gris m-auto">Carolina - Morón PBA</p>
             </div>
-            <div class="text-center col-4">
+            <div class="text-center col-md-4 col-12">
                 <img src="{{ url_for('static', filename = 'images/animal_3.jpg') }}" alt="Feature 3" class="rounded-circle my-4 object-fit-cover">
                 <p class="text-light m-auto">"Gracias a Patitas Perdidas pude encontrar a Chicho"</p>
                 <p class="txt-gris m-auto">Juan - San Telmo CABA</p>

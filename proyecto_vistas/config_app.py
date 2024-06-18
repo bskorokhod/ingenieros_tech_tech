@@ -8,3 +8,9 @@ ENDPOINT_API_REFUGIO = '/refugios'
 ENDPOINT_API_PERDIDAS = '/mascotas_perdidas'
 ENDPOINT_API_REPORTES = '/reportes_reencuentro'
 ENDPOINT_API_CARACTERISTICAS = '/caracteristicas_mascotas'
+
+# Cantidades máximas de elementos que se pasan por página
+LIMITE_MASCOTAS = 9 #              /encontrado
+LIMITE_REPORTES_REENCUENTRO = 5 #  /admin
+LIMITE_REPORTES_REFUGIOS = 5 #     /admin
+LIMITE_REFUGIOS = 12 #             /refugios

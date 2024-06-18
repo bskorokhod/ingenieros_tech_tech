@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %} Configuraciones Admin - Patitas Perdidas {% endblock %}
+{% block styles %} <link rel="stylesheet" href="{{ url_for('static', filename= 'css/styles_admin.css') }}"/> {% endblock %}
+{% set color_fondo = "bg-gris" %}
+{% set color_letras = "txt-verde" %}
+{% block content %}
+    <div class="container px-5">
+        <!-- Peticiones de reportes de reencuentro de mascotas -->
+        <div class="col-12 p-4 mb-4 bg-alga text-light rounded-3">
+            <h2><i class="fa-solid fa-magnifying-glass-location fs-1"></i> Validar reencuentro</h2>
+            <p>Bienvenido a la página de Validación de reportes. Acá, como administrador, tenés el poder de validar y aprobar reportes de reencuentro de mascotas. Tu papel es crucial para garantizar que cada mascota vuelva a su hogar, tendrás que verificar que el reporte sea verídico y consultar con los dueños de la mascota perdida la información necesaria para validar el reencuentro. Revisá con cuidado y asegurate de hacer lo correcto</p>
+        </div>
+        <div class="mb-5 rounded-3 bg-light text-success-emphasis">
+            <!-- Si no hay reportes de reencuentro, se muestra un mensaje -->
+            {% if reportes|length == 0 %}
+            <div class="bg-light p-4 text-center rounded-top-3">
+                <h4 class="txt-alga fw-bold"><i class="me-3 fa-solid fa-paw"></i>No hay reportes pendientes para revisar<i class="ms-3 fa-solid fa-paw"></i></h4>
+                <p class="m-0">¡Esperemos que aparezca uno pronto!</p>
+            </div>
+            {% else %}
+            <!-- Si hay reportes de reencuentro, se muestran para validarlos -->
+            {% for id_reporte, reporte in reportes.items() %}
+                <h3 class="ms-5 pt-3">REPORTE MASCOTA ENCONTRADA #{{ id_reporte }}</h3>
+                <div class="d-flex bg-light flex-md-row flex-column justify-content-md-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
+                    <p class="fw-1 fs-5">Nombre: {{ reporte['nombre_mascota'] }}<br>
+                    Ubicación de extravío: {{ reporte['direccion'] }}<br>
+                    Fecha de extravío: {{ reporte['fecha_extravio'] }}</p>
+                    <p class="m-md-auto ms-0 fw-1 fs-5">Nombre dueño: {{ reporte['nombre_contacto'] }}<br>
+                    Teléfono: {{ reporte['telefono_contacto'] }}</p>
+                    <div class="m-auto mx-5 my-2 my-md-0 d-flex justify-content-evenly">
+                        <form action="{{ url_for('admin_config') }}" method="POST">
+                            <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
+                            <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
+                            <input type="text" name="tipo" id="tipo" class="d-none" value="reencuentro">
+                            <input type="text" name="id_reporte" id="id_reporte" class="d-none" value="{{ id_reporte }}">
+                            <input type="text" name="id_mascota" id="id_mascota" class="d-none" value="{{ reporte['id_mascota'] }}">
+                            <input type="text" name="pag_actual_refugios" id="pag_actual_refugios" class="d-none" value="{{ pag_actual_refugios }}">
+                            <input type="text" name="pag_actual_reportes" id="pag_actual_reportes" class="d-none" value="{{ pag_actual_reportes }}">
+                            <button class="border border-0 bg-transparent fs-1 mx-3" type="submit" name="accion" value="aceptar"><i class="fa-solid fa-circle-check txt-alga"></i></button>
+                        </form>
+                        <form action="{{ url_for('admin_config') }}" method="POST">
+                            <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
+                            <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
+                            <input type="text" name="tipo" id="tipo" class="d-none" value="reencuentro">
+                            <input type="text" name="id_reporte" id="id_reporte" class="d-none" value="{{ id_reporte }}">
+                            <input type="text" name="id_mascota" id="id_mascota" class="d-none" value="{{ reporte['id_mascota'] }}">
+                            <input type="text" name="pag_actual_refugios" id="pag_actual_refugios" class="d-none" value="{{ pag_actual_refugios }}">
+                            <input type="text" name="pag_actual_reportes" id="pag_actual_reportes" class="d-none" value="{{ pag_actual_reportes }}">
+                            <button class="border border-0 bg-transparent fs-1" type="submit" name="accion" value="rechazar"><i class="fa-solid fa-circle-xmark txt-verde"></i></button>
+                        </form>
+                    </div>
+                </div>    
+            {% endfor %}
+
+            {% endif %}
+            <!-- Paginación de reportes -->
+            <div class="bg-light d-flex justify-content-center mt-3 bg-light rounded-bottom-3" id="pagination">
+                <form action="{{ url_for('admin_config') }}" method="POST">
+                    <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
+                    <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
+                    <input type="text" name="pag_actual_refugios" id="pag_actual_refugios" class="d-none" value="{{ pag_actual_refugios }}">
+                    <button type="submit" name="pag_actual_reportes" value="{{ pag_actual_reportes - 1 }}" class="btn btn-success bg-alga rounded-circle text-center text-light border-0 mx-3 btn-pag"
+                        {% if not hay_pag_ant_reportes %} disabled {% endif %}>
+                        <i class="m-0 p-0 fa-solid fa-angle-left"></i>
+                    </button>
+                </form>
+                
+                <p class="rounded-circle text-center bg-verde text-light pt-2 btn-pag">{{ pag_actual_reportes }}</p>
+                
+                <form action="{{ url_for('admin_config') }}" method="POST">
+                    <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
+                    <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
+                    <input type="text" name="pag_actual_refugios" id="pag_actual_refugios" class="d-none" value="{{ pag_actual_refugios }}">
+                    <button type="submit" name="pag_actual_reportes" value="{{ pag_actual_reportes + 1 }}" class="btn btn-success bg-alga rounded-circle text-center text-light border-0 mx-3 btn-pag"
+                        {% if not hay_pag_sig_reportes %} disabled {% endif %}>
+                        <i class="m-0 p-0 fa-solid fa-angle-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- Peticiones de confirmaciones de refugios -->
+        <div class="bg-naranja text-light col-12 p-4 mb-4 rounded-3">
+            <h2><i class="fa-solid fa-shield-heart fs-1"></i> Validar refugios</h2>
+            <p>Este es el apartado de peticiones de refugios, tendrás que verificar que el lugar solicitado sea seguro, tengan papeles y demás validaciones, para que logre ser un refugio de la página y sobre todas las cosas, un hogar para aquellas mascotas sin dueño</p>
+        </div>
+        <div class="mb-5 bg-light rounded-3 text-success-emphasis">
+            <!-- Si no hay peticiones de refugio, se muestra un mensaje -->
+            {% if refugios|length == 0 %}
+            <div class="bg-light bg-light p-4 text-center rounded-top-3">
+                <h4 class="txt-naranja fw-bold"><i class="me-3 fa-solid fa-house"></i>No hay pedidos de validación de refugios pendientes<i class="ms-3 fa-solid fa-house"></i></h4>
+                <p class="m-0">¡Esperemos que aparezca uno pronto!</p>
+            </div>
+            {% else %}
+            <!-- Si hay peticiones de refugio, se muestran para validarlos -->
+            {% for refugio in refugios %}
+                <h3 class="mx-5 pt-3">REFUGIO #{{ refugio['id'] }}</h3>
+                <div class="d-flex bg-light flex-md-row flex-column justify-content-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
+                    <p class="fw-1 fs-5">Nombre: {{ refugio['nombre'] }}<br>
+                    Ubicación: {{ refugio['direccion'] }}</p>
+                    <p class="m-md-auto ms-0 fw-1 fs-5">Teléfono: {{ refugio['telefono'] }}</p>
+                    <div class="m-auto mx-5 my-2 my-md-0 d-flex justify-content-evenly">
+                        <form action="{{ url_for('admin_config') }}" method="POST">
+                            <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
+                            <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
+                            <input type="text" name="tipo" id="tipo" class="d-none" value="refugio">
+                            <input type="text" name="id" id="id" class="d-none" value="{{ refugio['id'] }}">
+                            <input type="text" name="pag_actual_refugios" id="pag_actual_refugios" class="d-none" value="{{ pag_actual_refugios }}">
+                            <input type="text" name="pag_actual_reportes" id="pag_actual_reportes" class="d-none" value="{{ pag_actual_reportes }}">
+                            <button class="border border-0 bg-transparent fs-1 mx-3" type="submit" name="accion" value="aceptar"><i class="fa-solid fa-circle-check txt-alga"></i></button>
+                        </form>
+                        <form action="{{ url_for('admin_config') }}" method="POST">
+                            <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
+                            <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
+                            <input type="text" name="tipo" id="tipo" class="d-none" value="refugio">
+                            <input type="text" name="id" id="id" class="d-none" value="{{ refugio['id'] }}">
+                            <input type="text" name="pag_actual_refugios" id="pag_actual_refugios" class="d-none" value="{{ pag_actual_refugios }}">
+                            <input type="text" name="pag_actual_reportes" id="pag_actual_reportes" class="d-none" value="{{ pag_actual_reportes }}">
+                            <button class="border border-0 bg-transparent fs-1" type="submit" name="accion" value="rechazar"><i class="fa-solid fa-circle-xmark txt-verde"></i></button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+
+            {% endif %}
+            <!-- Paginación de refugios -->
+            <div class="d-flex justify-content-center bg-light pt-3 rounded-bottom-3">
+                <form action="{{ url_for('admin_config') }}" method="POST">
+                    <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
+                    <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
+                    <input type="text" name="pag_actual_reportes" id="pag_actual_reportes" class="d-none" value="{{ pag_actual_reportes }}">
+                    <button type="submit" name="pag_actual_refugios" value="{{ pag_actual_refugios - 1 }}" class="btn btn-warning rounded-circle text-center text-light border-0 mx-3 btn-pag"
+                        {% if not hay_pag_ant_refugios %} disabled {% endif %}>
+                        <i class="m-0 p-0 fa-solid fa-angle-left"></i>
+                    </button>
+                </form>
+    
+                <p class="rounded-circle text-center bg-naranja text-light pt-2 btn-pag">{{ pag_actual_refugios }}</p>
+                
+                <form action="{{ url_for('admin_config') }}" method="POST">
+                    <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
+                    <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
+                    <input type="text" name="pag_actual_reportes" id="pag_actual_reportes" class="d-none" value="{{ pag_actual_reportes }}">
+                    <button type="submit" name="pag_actual_refugios" value="{{ pag_actual_refugios + 1 }}" class="btn btn-warning rounded-circle text-center text-light border-0 mx-3 btn-pag"
+                        {% if not hay_pag_sig_refugios %} disabled {% endif %}>
+                        <i class="m-0 p-0 fa-solid fa-angle-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <a class="text-decoration-none my-4 bg-verde text-light border-0 fs-5 col-md-2 col-6 btn btn-success btn-lg" href="{{ url_for('login') }}">Salir</a>
+    </div>
+{% endblock %}
