@@ -337,6 +337,104 @@ Si la consulta fue exitosa, el servicio devuelve una tupla que contiene un JSON 
 * Si hubo un error al hacer la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error y el código de estado `500`.
 
 
+## Endpoint '/refugios'
+Recibe métodos `GET`, `POST`, `PATCH`, `DELETE`  
+### GET 
+Devuelve un JSON (lista de diccionarios) con formato:
+```py
+{
+    "refugios":[   
+        {
+            'id': '1',
+            'nombre': 'Red Patitas',
+            "coordx":'123.456',
+            "coordy":'123.456',
+            'telefono': '11 1234-5678',
+            'direccion': 'Paseo Colón 2345'
+        },
+        {
+            'id': '2',
+            'nombre': 'Patitas felices',
+            "coordx":'123.456',
+            "coordy":'123.456',
+            'telefono': '11 4321-8765',
+            'direccion': 'Paseo Colón 2345'
+        }
+    ],
+    "hay_pag_siguiente":bool
+}
+```
+
+Donde cada diccionario tiene la información correspondiente a un refugio, almacenado en la Base de datos.
+
+#### Parámetros
+Recibe como parámetros/argumentos 3 claves: 
+
+* Recibe el parámetro `aceptado` que es o `"TRUE"` o `"FALSE"`.
+
+Dependiendo de este parámetro, devolverá o los refugios que hayan sido o no aceptados.  
+En caso no se trate de un parámetro esperado, se considera una `Bad Request`.
+
+* Recibe el parámetro `pagina` como un `int` número de página actual.
+
+* Recibe el parámetro `elementos` como un `int` cantidad de elementos máximos a entregar por página. 
+
+#### Retorno
+* En base a los parámetros `elemntos` y `pagina`, se realiza la paginación una solicitud SQL de forma:
+
+```sql
+SELECT * FROM 'refugios' WHERE aceptado = TRUE LIMIT 8 OFFSET 0;
+```
+
+En este caso `elementos` es 8 y `pagina` 1. De manera que si ingresa `pagina:3` y `elemntos:8`. La query que se realizará es la siguiente: 
+
+```sql
+SELECT * FROM 'refugios' WHERE aceptado = TRUE LIMIT 8 OFFSET 16;
+```
+De esta manera, se devolverán únicamente los refugios correspondientes a la página 3, (iniciando desde el refugio `pagina * elementos - 1`, que es 16 en este caso) siendo el límite por página de 8 (es decir, esta query traerá los refugios 16 a 24).
+
+* Devuelve con la clave `"hay_pag_siguiente"` un valor booleano. que indica si existe por lo menos 1 refugio maás en la Base de datos.
+
+
+* Devuelve además, el código de estado `200` en caso de no ocurrir errores.
+
+### POST
+Recibe la información de un json de formato:
+```py
+{
+    "nombre":"nombre_refugio",
+    "coordx":'123.456',
+    "coordy":'123.456',
+    "telefono":'1115642564',
+    "direccion":"Paseo Colón 2345",
+}
+```
+
+Esta es la información correspondiente a un nuevo refugio a agregar a la BBDD.
+
+* Devuelve el código de estado `201` en caso de no ocurrir errores.
+
+### PATCH
+
+Recibe la `id` de un refugio en un JSON de formato `{'id':6}`.  
+Verifica si existe el `id` (tomándolo como una `Bad request`, si este no existe).  
+Y en caso afirmativo, cambia el valor de la columna `aceptado` a `true` para el `id` recibido.
+
+* Devuelve el código de estado `200` en caso de no ocurrir errores.
+
+### DELETE
+Recibe la `id` de un refugio en un JSON de formato `{'id':9}`.  
+Verifica si existe el `id` (tomándolo como una `Bad request`, si este no existe).  
+Y en caso afirmativo, elmina de la BBDD, toda la información correspondiente a este `id`.
+
+* Devuelve el código de estado `200` en caso de no ocurrir errores.
+
+### Manejo de errores en el Endpoint
+En caso de no cumplirse con el contrato de uso establecido:   
+* Se devolverá un JSON con el mensaje `Bad request` y el código de estado `400`.
+*  En caso de ocurrir un error conectando con la Base de datos (Un error interno del servidor), devolverá la causa del error en un JSON de formato `{"mensaje":casua_error}`, además del código `500`.
+
+
 ## Endpoint /master
 
 ### Descripción
@@ -381,6 +479,31 @@ Se devuelve un JSON con los datos de esa tabla y los valores de la fila:
 #### Manejo de Errores
 * Si ocurre un error al ejecutar la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error y el código de estado `500`. Si no se envía una tabla o un id, el código de estado es `400`.
 
+### DELETE
+Elimina una fila de la tabla pedida al conocer su id (id_reporte en el caso de la tabla reportes_reencuentro).
+
+#### Parámetros de Query
+Recibe como parámetros:
+* `tabla` es el nombre (`str`) de la tabla en la cuál se quiere eliminar una fila. El nombre de la tabla tiene que encontrarse en la Base de Datos.
+
+* id/id_reporte: El id (`int`) de la fila que se quiere pedir. El id de la fila que se quiere solicitar. Tiene que corresponder a una fila que exista, de lo contrario, se considera.
+
+#### Ejemplo de Uso
+
+Eliminar la mascota de id: 22 de la tabla animales_perdidos:
+Y tras realizar un GET a la siguiente URI:
+
+    http://127.0.0.1:5001/master?tabla=animales_perdidos&id=22
+
+Realizará internamente la query SQL:
+
+```sql
+DELETE FROM `animales_perdidos` WHERE `id` = 22;
+```
+#### Manejo de Errores
+Si ocurre un error al ejecutar la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error y el código de estado `500`.
+Si no cumple con los parámetros esperados (tabla o un id inválidos), el código de estado es `400`.
+
 ### POST
 
 #### BODY
@@ -392,7 +515,7 @@ Recibe un JSON con el siguiente formato:
     "campo2": "valor2",
     "..."
 }
-
+```
 Donde tabla es el nombre de la tabla en la base de datos y los demás campos son los datos a insertar en la tabla especificada.
 
 #### Proceso

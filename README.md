@@ -38,6 +38,8 @@ cd proyecto_api
 pipenv shell 
 flask run --port=5001
 ```
+4. Redefinir las constantes globales de los archivos `config_app.py` y `config_api.py` según corresponda.
+
 ## Uso
 ### Registro de Mascotas Perdidas
 1. Accede a la vista `/perdido`.
