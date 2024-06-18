@@ -1,0 +1,14 @@
+.btn-pag{
+    height: 7vh;
+    width: 7vh;
+}
+
+#pagination button:disabled, button[disabled]{
+    background-color: #87a922;
+    opacity: 0.5;
+}
+
+#paginacion button:disabled, button[disabled]{
+    background-color: #FEA724;
+    opacity: 0.5;
+}
