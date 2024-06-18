@@ -133,7 +133,24 @@ Por favor, completa el siguiente formulario con la información de tu mascota, l
 
           </form>    
      </div>
-
+<!-- MODAL ERROR FECHA -->
+<div class="modal fade modal-lg" id="popUpErrorFecha" aria-hidden="true" aria-labelledby="popUpErrorFechaLabel"
+tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+        <div class="border-0 pb-0 text-end">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <h1 class="modal-title text-center fs-3 txt-alga fw-bold lh-1" id="popUpErrorFechalabel">¡Lo sentimos!</h1>
+        </div>
+        <div class="modal-body text-center"id="popUpErrorFechaBody">
+            <p class="fs-5 fw-light text-center">Al parecer has ingresado una fecha inválida</p>
+            <i class="txt-alga me-3 fs-5 fa-solid fa-paw"></i>
+            <i class="txt-verde fs-3 fa-regular fa-face-frown"></i>
+            <i class="txt-alga ms-3 fs-5 fa-solid fa-paw"></i>
+        </div>
+    </div>
+  </div>
+</div>
 {% endblock formulario %}
 
 {% block scripts %}
