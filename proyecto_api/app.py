@@ -285,10 +285,48 @@ def reportes_reencuentro():
 
 @app.route('/mascotas_perdidas', methods=["GET", "POST"])
 def mascotas_perdidas():
+    """
+    Método POST:
+    Se reciben los datos de una mascota perdida para agregarlos a la Base de Datos.
+
+    PRECONDICIONES:
+        - Los datos de la mascota se reciben en un JSON, que contiene las columnas y sus respectivos
+        valores.
     
+    POSTCONDICIONES:
+        - Si los datos son válidos, se agrega la mascota a `TABLA_ANIMALES_PERDIDOS`, y se devuelve un mensaje
+        que indica que todo salió bien, junto a un código de estado 201. Si los datos que se enviaron en
+        el JSON, no son válidos para la tabla `TABLA_ANIMALES_PERDIDOS`, devuelve un `Bad request` y código de
+        estado 400. Si ocurrió un error mientras se insertaban los datos en la tabla, se devuelve un 
+        mensaje que lo indica y un código de estado 500.
+
+    Método GET:
+    Se devuelve una página de la tabla `TABLA_ANIMALES_PERDIDOS` según los filtros que se envíen.
+
+    PRECONDICIONES:
+        - Los filtros se envían como parámetros en el argumento de la request, y deben especificar
+        las columnas y valores según los que se quiera filtrar. También pueden aclarar la `pagina`
+        que se desea obtener y `elementos` para la cantidad que se quiera ver en ellas.
+
+    POSTCONDICIONES: 
+        - Se devuelve un JSON que contiene:
+            - `mascotas`: Una lista con los datos de las mascotas que cumplen con los filtros según
+            la `pagina` y `elementos` pedidos.
+            - `pagina`: La página que se solicitó
+            - `hay_pagina_previa`: Un valor booleano que indica si es posible solicitar una página 
+            anterior a la actual.
+            - `hay_pagina_siguiente`: Un valor booleano que indica si es posible solicitar una página 
+            posterior a la actual.
+        - Si surge un error al ejecutar una consulta, se devuelve un JSON con su mensaje de error y
+        código de estado 500.
+    """
     if request.method == "POST":
         
         datos_mascota = request.get_json()
+
+        # Validamos que el JSON recibido corresponda a una posible mascota perdida
+        if not es_animal_perdido(datos_mascota):
+            return jsonify({"mensaje": "Bad request"}), 400
 
         columnas = []
         valores = []
@@ -297,58 +335,73 @@ def mascotas_perdidas():
         for columna, dato in datos_mascota.items():
             if dato:
                 columnas.append(columna)
-                valores.append(f"'{dato}'")
+                valores.append(f"""'{dato}'""")
 
-        # Gracias a los bucles, me aseguro que se van a añadir los datos a las columnas correspondientes
-        clausula_insert = "INSERT INTO animales_perdidos (" + ", ".join(columnas) + ") "
-        clausula_values = "VALUES (" + ", ".join(valores) + ");"
+        query = f"""
+        INSERT INTO {TABLA_ANIMALES_PERDIDOS} ({', '.join(columnas)}) 
+        VALUES ({', '.join(valores)});"""
 
-        # Junto ambas partes para formar la query
-        query = clausula_insert + clausula_values
+        mensaje, codigo_estado = realizar_cambios(query, 201, engine)
 
-        try:
-            with engine.begin() as conexion:
-                conexion.execute(text(query))
-        except SQLAlchemyError as err:
-            return jsonify(str(err.__cause__)), 500
-        
-        return jsonify({'mensaje': "Los datos se agregaron correctamente"}), 201
+        return jsonify({'mensaje': mensaje}), codigo_estado
         
     elif request.method == "GET":
         
         filtros = []
         clausula_where = ""
 
-        # request.args.items() recibe las columnas solicitadas y sus respectivos valores en un tupla a partir de la URL
+        # si no se pide ninguna página especifica se muestra la primera
+        pagina = request.args.get('pagina', 1, type=int)
+        # si no se pide ninguna cantidad especifica devuelve los 20 primeros elementos
+        elementos = request.args.get('elementos', 20, type=int)
+
+        # recibimos las columnas y valores con los que vamos a filtrar en los parámetros enviados
         for columna, valor in request.args.items():
-            if valor:
-                filtros.append(f"{columna} = '{valor}'")
-                
-        if filtros:
-            clausula_where = "WHERE " + " AND ".join(filtros)
-        clausula_where += ";"
-
-        # Escribo la query y le agrego la clausula_where
-        query = """
-        SELECT id, nombre_mascota, animal, raza, sexo, color, edad, coordx, coordy, fecha_extravio, telefono_contacto, nombre_contacto, IF(info_adicional IS NOT NULL, info_adicional, "No se ingresó ninguna información adicional.") as info_adicional 
-        FROM animales_perdidos 
-        """ + clausula_where 
+            if valor and columna not in {'pagina', 'elementos'}:
+                filtros.append(f"""{columna} = '{valor}'""")
         
-        mascotas_perdidas = []
-        try:
-            with engine.connect() as conexion:
-                filas_mascotas = conexion.execute(text(query))
-        except SQLAlchemyError as err:
-            return jsonify(str(err.__cause__)), 500
+        # Verificamos que haya algún filtro para agregar la línea a la clausula_where
+        if filtros:
+            clausula_where = f"WHERE {' AND '.join(filtros)}"
 
-        # .mappings() me permite generar diccionarios con las columnas y los valores de la fila correspondiente
-        for mascota in filas_mascotas.mappings():
+        # Pedimos los datos de las mascotas que coinciden con lo pedido
+        query_recibir_mascotas = f"""
+        SELECT * 
+        FROM {TABLA_ANIMALES_PERDIDOS} 
+        {clausula_where} 
+        LIMIT {elementos} OFFSET {(pagina - 1) * elementos};"""
+
+        res_mascotas, codigo_estado_mascotas = traer_info(query_recibir_mascotas, 200, engine)
+        if codigo_estado_mascotas != 200:
+            return jsonify({"mensaje": res_mascotas}), codigo_estado_mascotas
+
+        # Si esta query devuelve un 1, significa que hay al menos una mascota más, si no devuelve nada, estamos en la última página
+        query_verificar_pagina = f"""
+        SELECT 1 
+        FROM {TABLA_ANIMALES_PERDIDOS} 
+        {clausula_where} 
+        LIMIT 1 OFFSET {pagina * elementos};"""
+
+        res_verificacion_pagina = realizar_query_validacion(query_verificar_pagina, engine)
+        if res_verificacion_pagina == -1:
+            return jsonify({"mensaje": "Hubo un problema al realizar la consulta."}), 500
+            
+        mascotas_perdidas = []
+
+        for mascota in res_mascotas.mappings():
             dict_mascota = dict(mascota)
             dict_mascota['fecha_extravio'] = dict_mascota['fecha_extravio'].strftime("%d/%m/%Y")
 
             mascotas_perdidas.append(dict_mascota)
 
-        return jsonify(mascotas_perdidas), 200
+        resultados = {
+            'mascotas': mascotas_perdidas,
+            'pagina': pagina,
+            'hay_pagina_previa': pagina - 1 > 0,
+            'hay_pagina_siguiente': res_verificacion_pagina == 1
+        }
+
+        return jsonify(resultados), 200
 
 @app.route('/master', methods = ['GET','POST','PATCH', 'DELETE'])
 def master():

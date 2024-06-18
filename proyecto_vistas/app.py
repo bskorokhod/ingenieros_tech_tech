@@ -285,28 +285,37 @@ def perdido():
 @app.route('/encontrado', methods=["GET", "POST"])
 def encontrado():
 
-    datos_caracteristicas = requests.get(HOST_API + '/caracteristicas_mascotas')
-    if datos_caracteristicas.status_code == 200:
-        caracteristicas_animales = datos_caracteristicas.json()
-    else:
+    # Recibimos las características de los animales para que se puedan usar en los filtros
+    datos_caracteristicas = requests.get(f"{HOST_API}{ENDPOINT_API_CARACTERISTICAS}")
+    if datos_caracteristicas.status_code == 500:
         return internal_server_error(e=datos_caracteristicas.status_code)
     
-    filtros_busqueda = ""
+    caracteristicas_animales = datos_caracteristicas.json()
 
-    # al recibir un POST se agregan los filtros a filtros_busqueda, si se recibe GET, los filtros quedan vacíos.
+    # Inicialmente se solicita la página 1 de las mascotas perdidas
+    filtros_busqueda = {'pagina': 1}
+
+    # Recibimos el número de página que se quiere ver, junto a todos los filtros solicitados
     if request.method == "POST":
-
-        for clave, valor in request.form.items():
-            filtros_busqueda += f"{clave}={valor}&"
-
-    datos_mascotas = requests.get(HOST_API + '/mascotas_perdidas?' + filtros_busqueda)
-
-    if datos_mascotas.status_code == 200:
-        mascotas_perdidas = datos_mascotas.json()
-    else:
+        filtros_busqueda = dict(request.form)
+    
+    # Agregamos la cantidad de elementos de la página y filtramos por los animáles que aún no se confirmó que hayan sido encontrados
+    filtros_busqueda.update({'elementos': LIMITE_MASCOTAS, 'encontrado': 0})
+    
+    datos_mascotas = requests.get(f"{HOST_API}{ENDPOINT_API_PERDIDAS}", params=filtros_busqueda)
+    if datos_mascotas.status_code == 500:
         return internal_server_error(e=datos_mascotas.status_code)
+    
+    info_mascotas = datos_mascotas.json()
+    mascotas_perdidas = info_mascotas.get('mascotas')
 
-    return render_template('mascotas_perdidas.html', caracteristicas = caracteristicas_animales, mascotas = mascotas_perdidas)
+    # Si mascota["info_adicional"] es None, se cambia por un mensaje predefinido para mejor estética
+    for mascota in mascotas_perdidas:
+        if not mascota["info_adicional"]:
+            mascota["info_adicional"] = "No se ingresó ninguna información adicional."
+    
+    # Devolvemos las características, las mascotas perdidas, la página que se solicitó, y valores booleanos para saber si hay una página anterior o una posterior
+    return render_template('mascotas_perdidas.html', caracteristicas = caracteristicas_animales, mascotas = mascotas_perdidas, pagina_actual = info_mascotas.get('pagina'), hay_pagina_previa = info_mascotas.get('hay_pagina_previa'), hay_pagina_siguiente = info_mascotas.get('hay_pagina_siguiente'), filtros = dict(request.form.items()))
 
 @app.errorhandler(400)
 def bad_request(e):
