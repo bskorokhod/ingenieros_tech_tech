@@ -4,7 +4,7 @@
 {% set color_fondo = "bg-gris" %}
 {% set color_letras = "txt-verde" %}
 {% block content %}
-    <div class="container">
+    <div class="container px-5">
         <!-- Peticiones de reportes de reencuentro de mascotas -->
         <div class="col-12 p-4 mb-4 bg-alga text-light rounded-3">
             <h2><i class="fa-solid fa-magnifying-glass-location fs-1"></i> Validar reencuentro</h2>
@@ -21,13 +21,13 @@
             <!-- Si hay reportes de reencuentro, se muestran para validarlos -->
             {% for id_reporte, reporte in reportes.items() %}
                 <h3 class="ms-5 pt-3">REPORTE MASCOTA ENCONTRADA #{{ id_reporte }}</h3>
-                <div class="d-flex bg-light justify-content-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
+                <div class="d-flex bg-light flex-md-row flex-column justify-content-md-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
                     <p class="fw-1 fs-5">Nombre: {{ reporte['nombre_mascota'] }}<br>
                     Ubicación de extravío: {{ reporte['direccion'] }}<br>
                     Fecha de extravío: {{ reporte['fecha_extravio'] }}</p>
-                    <p class="m-auto fw-1 fs-5">Nombre dueño: {{ reporte['nombre_contacto'] }}<br>
+                    <p class="m-md-auto ms-0 fw-1 fs-5">Nombre dueño: {{ reporte['nombre_contacto'] }}<br>
                     Teléfono: {{ reporte['telefono_contacto'] }}</p>
-                    <div class="m-auto mx-5 d-flex justify-content-evenly">
+                    <div class="m-auto mx-5 my-2 my-md-0 d-flex justify-content-evenly">
                         <form action="{{ url_for('admin_config') }}" method="POST">
                             <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
                             <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
@@ -96,11 +96,11 @@
             <!-- Si hay peticiones de refugio, se muestran para validarlos -->
             {% for refugio in refugios %}
                 <h3 class="mx-5 pt-3">REFUGIO #{{ refugio['id'] }}</h3>
-                <div class="d-flex bg-light justify-content-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
+                <div class="d-flex bg-light flex-md-row flex-column justify-content-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
                     <p class="fw-1 fs-5">Nombre: {{ refugio['nombre'] }}<br>
                     Ubicación: {{ refugio['direccion'] }}</p>
-                    <p class="m-auto fw-1 fs-5">Teléfono: {{ refugio['telefono'] }}</p>
-                    <div class="mb-3 mx-5 d-flex justify-content-evenly">
+                    <p class="m-md-auto ms-0 fw-1 fs-5">Teléfono: {{ refugio['telefono'] }}</p>
+                    <div class="m-auto mx-5 my-2 my-md-0 d-flex justify-content-evenly">
                         <form action="{{ url_for('admin_config') }}" method="POST">
                             <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
                             <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
@@ -149,6 +149,6 @@
                 </form>
             </div>
         </div>
-        <a class="text-decoration-none my-4 bg-verde text-light border-0 fs-5 col-2 btn btn-success btn-lg" href="{{ url_for('login') }}">Salir</a>
+        <a class="text-decoration-none my-4 bg-verde text-light border-0 fs-5 col-md-2 col-6 btn btn-success btn-lg" href="{{ url_for('login') }}">Salir</a>
     </div>
 {% endblock %}

@@ -10,19 +10,19 @@
 {% set color_fondo = "bg-gris" %}
 {% set color_letras = "txt-verde" %}
 {% block content %}
-    <div class="container">
+    <div class="container px-5">
         <div class="bg-verde col-12 p-4 mb-4 rounded-3">
             <h1 class="text-light display-5 fw-bold">Refugios en nuestra red</h1>
-            <p class="text-light lh-sm m-0 fs-5">Aquí encontrarás todos los refugios de nuestra red, con este mapa interactivo podrás buscarlos, y abajo hay un listado de estos, con su respectiva información para contactarlos en caso de encontrar una mascota en la calle que parezca no tener dueño y estar perdida</p>
+            <p class="text-light lh-sm m-0 fs-md-5">Aquí encontrarás todos los refugios de nuestra red, con este mapa interactivo podrás buscarlos, y abajo hay un listado de estos, con su respectiva información para contactarlos en caso de encontrar una mascota en la calle que parezca no tener dueño y estar perdida</p>
         </div>
 
         <!-- Mapa -->
         <div id="map" class="my-4 rounded-3 bg-light"></div>
 
         <!-- Refugios -->
-        <div class="row gx-3 row-cols-4 px-4 py-2">
+        <div class="row gx-3 row-cols-md-4 px-4 py-2">
             {% for refugio in refugios %}
-            <div class="col-3 tarjeta-refugio h-auto my-3" data-nombre="{{ refugio['nombre'] }}" data-coordx="{{ refugio['coordx'] }}" data-coordy="{{ refugio['coordy'] }}">
+            <div class="col-md-3 col-12 tarjeta-refugio h-auto my-3" data-nombre="{{ refugio['nombre'] }}" data-coordx="{{ refugio['coordx'] }}" data-coordy="{{ refugio['coordy'] }}">
                 <div class="position-relative">
                     <span class="position-absolute top-0 start-0 translate-middle p-2 bg-white rounded-circle">
                         <i class="txt-naranja fa-solid fa-shield-heart fs-3"></i>
