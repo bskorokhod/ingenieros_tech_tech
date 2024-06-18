@@ -103,6 +103,43 @@ El JSON contiene:
 #### Manejo de Errores
 * Si ocurre un error al ejecutar la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error y el código de estado `500`. 
 
+## API Endpoint '/login_admin'
+
+Recibe solo requests del método `GET`.
+
+### GET
+
+#### Parametros de Query
+* `user` : Parametro 
+* `password` : 
+
+Estos parametros los almacena en dos variables llamadas como los parametros.
+
+Manda a la BBDD una consulta 
+```sql
+SELECT * FROM admin WHERE usuario = '{user}' AND contrasena = '{password}'
+```
+para buscar coincidencias.
+
+Si la consulta encuentra al menos una fila, devuelve un JSON con el siguiente formato y el código de estado 200:
+```json
+{
+    "code": 1
+}
+```
+
+Si no encuentra coincidencias, devuelve un JSON con el siguiente formato y el código de estado 200:
+```json
+{
+    "code": 0
+}
+```
+
+
+#### Errores en el Endpoint
+En caso de que ocurra un error en la conexion con la BBDD se retorna un json con la causa o causas del error y el codigo de estado 500
+
+
 ## Endpoint /reportes_reencuentro
 
 ### Descripción
@@ -337,9 +374,43 @@ Se devuelve un JSON con los datos de esa tabla y los valores de la fila:
     "direccion": "Avenida Rivadavia 4567",
     "coordx": -34.607162,
     "coordy": -58.384264,
-    "teléfono": 01148975634,
+    "teléfono": "01148975634",
     "aceptado": 1
 }
 ```
 #### Manejo de Errores
 * Si ocurre un error al ejecutar la consulta, el servicio devuelve una tupla que contiene un JSON con la causa del error y el código de estado `500`. Si no se envía una tabla o un id, el código de estado es `400`.
+
+### POST
+
+#### BODY
+Recibe un JSON con el siguiente formato:
+```json
+{
+    "tabla": "nombre_de_la_tabla",
+    "campo1": "valor1",
+    "campo2": "valor2",
+    "..."
+}
+
+Donde tabla es el nombre de la tabla en la base de datos y los demás campos son los datos a insertar en la tabla especificada.
+
+#### Proceso
+
+1. Extrae el valor de `tabla` del JSON recibido y lo almacena en la variable `tabla`.
+2. Verifica si `tabla` está en la lista de tablas permitidas (`TABLAS`):
+    * Si no está, devuelve un JSON con el mensaje "Bad request" y el código de estado `400`.
+3. Si la tabla es válida, verifica que el JSON recibido tiene la estructura correcta para la tabla especificada:
+    * Si `tabla` es `animales_perdidos`, verifica que el JSON cumple con la estructura esperada para `animales_perdidos`.
+    * Si `tabla` es `refugios`, verifica que el JSON cumple con la estructura esperada para `refugios`.
+    * Si `tabla` es `admin`, verifica que el JSON cumple con la estructura esperada para `admin`.
+    * Si `tabla` es `caracteristicas_mascotas`, verifica que el JSON cumple con la estructura esperada para `caracteristicas_mascotas`.
+    * Si la estructura no es correcta, devuelve un JSON con el mensaje "Bad request" y el código de estado `400`.
+4. Extrae las claves y valores del JSON recibido que coinciden con las columnas de la tabla especificada.
+5. Construye una consulta SQL `INSERT INTO` con las claves y valores extraídos.
+6. Ejecuta la consulta SQL para insertar los datos en la base de datos.
+7. Devuelve un JSON con el mensaje resultante de la operación y el código de estado correspondiente (`200` si fue exitoso).
+
+#### Errores en el Endpoint
+
+En caso de que ocurra un error en la conexión con la BBDD, se retorna un JSON con la causa o causas del error y el código de estado `500`.
