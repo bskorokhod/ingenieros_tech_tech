@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request
 import requests
 from config_app import PUERTO_APP, HOST_API, ENDPOINT_API_REFUGIO, ENDPOINT_API_REPORTES, ENDPOINT_API_LOGIN, ENDPOINT_API_CARACTERISTICAS, ENDPOINT_API_PERDIDAS, LIMITE_MASCOTAS, LIMITE_REFUGIOS, LIMITE_REPORTES_REENCUENTRO, LIMITE_REPORTES_REFUGIOS
-from validaciones import es_refugio
+from validaciones import es_refugio, es_animal_perdido
 
 app = Flask(__name__)
 
@@ -270,13 +270,16 @@ def perdido():
         datos_mascota_perdida['info_adicional'] = request.form.get('info_adicional')
         datos_mascota_perdida['direccion'] = request.form.get('direccion')
 
+        if not es_animal_perdido(datos_mascota_perdida):
+            return bad_request(e=400) # Función que renderiza un template de error 400
+
         # Pegarle a la API para insertar el nuevo registro en la BBDD
         # Los campos sin completar se envían como cadenas vacías
-        response = requests.post(HOST_API + '/mascotas_perdidas', json=datos_mascota_perdida) # HOST_API es una variable global
+        response = requests.post(HOST_API + '/mascotas_perdidas', json=datos_mascota_perdida) # HOST_API definida en config_app.py
         if response.status_code == 201:
             return redirect(url_for("aceptado", formulario="mascota"))
         elif response.status_code == 400:
-            return bad_request(e=response.status_code) # Función que renderiza un template de error 500
+            return bad_request(e=response.status_code)
         return internal_server_error(e=response.status_code)
 
 
