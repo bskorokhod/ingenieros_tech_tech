@@ -552,46 +552,60 @@ def master():
 @app.route('/refugios', methods = ['GET','POST','PATCH', 'DELETE'])
 def refugios():
     if request.method == "POST": # se busca añadir un refugio y se recibe un body json con la data del formulario
+        query = f"INSERT INTO {TABLA_REFUGIOS} (nombre, coordx, coordy, telefono, direccion) " 
         informacion = request.get_json()
-        # Queda pendiente validar si las claves se encuentran en el json
-        nombre_refugio = informacion.get("nombre")
-        coord_x = informacion.get("coordx")
-        coord_y = informacion.get("coordy")
-        telefono = informacion.get("telefono")
-        direccion = informacion.get("direccion")
-        query = f"INSERT INTO {TABLA_REFUGIOS} (nombre, coordx, coordy, telefono, direccion) VALUES ('{nombre_refugio}', '{coord_x}', '{coord_y}', '{telefono}', '{direccion}');" 
-        try:
-            with engine.begin() as conexion:
-                resultado = conexion.execute(text(query))
-                # al realizar engine.begin() al finalizar el bloque se agrega automáticamente el engine.commit() tras realizar los cambios guardándolos
-                return jsonify({"mensaje":"exito"}), 201 
-        except SQLAlchemyError as err:
-            return jsonify(str(err.__cause__)), 500
+
+        if not es_refugio(informacion):
+           return jsonify({"mensaje":"Body inválido"}), 400 # Bad request
+
+        nombre_refugio = informacion["nombre"]
+        coord_x = informacion["coordx"]
+        coord_y = informacion["coordy"]
+        telefono = informacion["telefono"]
+        direccion = informacion["direccion"]
+
+
+        query += f"VALUES ('{nombre_refugio}', '{coord_x}', '{coord_y}', '{telefono}', '{direccion}');"
+
+
+        resultado, codigo = realizar_cambios(query, 201, engine)
+        return jsonify({"mensaje":resultado}), codigo
 
     if request.method == "GET":
-        informacion = request.get_json()
-        if informacion == {}: # o  'if not informacion'
-            filtro="TRUE"
-        elif informacion.get("aceptado") == "false":
-            filtro="FALSE"
-        else: # Body inválido
+        pagina = request.args.get('pagina', 1, type=int)
+        elementos = request.args.get('elementos', 16, type=int)
+        filtro = request.args.get('aceptado', "/")
+        if filtro not in ("TRUE","FALSE"):
             return jsonify({"mensaje":"Body inválido"}), 400 # Bad request
-        query = f"SELECT * FROM {TABLA_REFUGIOS} WHERE aceptado = {filtro};"
-        try:
-            with engine.connect() as conexion:
-                resultado = conexion.execute(text(query))
-        except SQLAlchemyError as err:
-            return jsonify(str(err.__cause__)), 500
+
+        query = f"SELECT * FROM {TABLA_REFUGIOS} WHERE aceptado = {filtro} "
+
+        query += f"LIMIT {elementos} OFFSET {(pagina - 1) * elementos};"
+
+
+        resultado, codigo = traer_info(query, 200, engine)
+        if codigo != 200:
+            return jsonify({"mensaje": resultado}), codigo
         datos = []
         for fila in resultado:
             dato = {}
+            dato["id"]=fila.id
             dato["nombre"] = fila.nombre
             dato["telefono"] = fila.telefono
             dato["direccion"] = fila.direccion
             dato["coordx"] = fila.coordx
             dato["coordy"] = fila.coordy
             datos.append(dato)
-        return jsonify(datos), 200
+
+        # ahora verifico si hay siguiente pagina
+        query_pagina_siguiente = f"SELECT 1 FROM {TABLA_REFUGIOS} WHERE aceptado = {filtro} LIMIT 1 OFFSET {pagina * elementos};"
+
+        # es otro traer info, contar rowcount y listo
+        validacion = realizar_query_validacion(query_pagina_siguiente, engine)
+
+        if validacion != -1:
+            return jsonify({"refugios":datos, "hay_pag_siguiente":bool(validacion)}), 200
+        return jsonify({"mensaje":"Error"}), 500
 
     # si llegó a este punto, el metodo o es PATCH, o es DELETE
     informacion = request.get_json()
@@ -599,27 +613,22 @@ def refugios():
     if id_del_refugio == -1: # nunca va a existir un id '-1'
         return jsonify({"mensaje":"Body inválido"}), 400 # Bad request
 
-    query_validacion = f"SELECT * FROM {TABLA_REFUGIOS} WHERE 'id' = {id_del_refugio};"
-    try:
-        with engine.connect() as conexion:
-            resultado = conexion.execute(text(query_validacion))
-    except SQLAlchemyError as err:
-        return jsonify(str(err.__cause__)), 500
+    query_validacion = f"SELECT * FROM {TABLA_REFUGIOS} WHERE id = {id_del_refugio};"
 
-    if resultado.rowcount == 0: # No hay ningún refugio con ese id
-        return jsonify({"mensaje":"Body inválido"}), 400 
+
+    validacion = realizar_query_validacion(query_validacion, engine)
+    if validacion == -1:
+      return jsonify({"mensaje":"Ocurrió un error"}), 500
+    if validacion == 0:
+      return jsonify({"mensaje":"Bad request"}), 400 # No existe el id en la BBDD
     
+    # si llegó aca, la validacion dio positiva
     if request.method == "PATCH":
         query = f"UPDATE {TABLA_REFUGIOS} SET aceptado = TRUE WHERE id = {id_del_refugio};"
     else: # metodo == "DELETE"
         query = f"DELETE FROM {TABLA_REFUGIOS} WHERE id = {id_del_refugio};"
-    try:
-        with engine.begin() as conexion:
-            resultado = conexion.execute(text(query))
-            # al realizar engine.begin() al finalizar el bloque se agrega automáticamente el engine.commit() tras realizar los cambios guardándolos
-            return jsonify({"mensaje":"exito"}), 201 
-    except SQLAlchemyError as err:
-        return jsonify(str(err.__cause__)), 500
+
+    resultado, codigo = realizar_cambios(query, 200, engine)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=PUERTO_API)
