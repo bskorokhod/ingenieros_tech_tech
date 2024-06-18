@@ -28,8 +28,8 @@ function ubicar(coordenadas) {
 // agrego el marcador al mapa por cada mascota
 function mostrar_mascotas(mascotas) {
     for (let mascota of mascotas) {
-        let latitud = mascota.dataset.coordx;
-        let longitud = mascota.dataset.coordy;
+        let latitud = mascota.dataset.coordy;
+        let longitud = mascota.dataset.coordx;
         let coordenadas = [latitud, longitud];
         
         // agrego una pata de perro o de gato según corresponda
@@ -46,11 +46,10 @@ function mostrar_mascotas(mascotas) {
 
 // agrego el marcador al mapa por cada refugio
 function mostrar_refugios(refugios) {
-    for (let refugio of tarjetas_refugios) {
-        let latitud = refugio.dataset.coordx;
-        let longitud = refugio.dataset.coordy;
+    for (let refugio of refugios) {
+        let latitud = refugio.dataset.coordy;
+        let longitud = refugio.dataset.coordx;
         let coordenadas = [latitud, longitud];
-        console.log(refugio.dataset.nombre);
         
         let marcador = L.marker(coordenadas, { icon: icono_refugio }).addTo(mapa);
         marcador.bindPopup(refugio.dataset.nombre, { closeButton: false, className: 'popup_refugio' });

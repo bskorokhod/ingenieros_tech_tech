@@ -9,3 +9,13 @@ button[name='btnVerMas']:hover{
 .modal svg{
     width: 40%;
 }
+
+.btn-pag{
+    height: 7vh;
+    width: 7vh;
+}
+
+#pagination button:disabled, button[disabled]{
+    background-color: #87a922;
+    opacity: 0.5;
+}

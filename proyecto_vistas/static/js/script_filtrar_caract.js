@@ -12,12 +12,16 @@ const colores_perros = colores.filter((elem)=> elem.dataset.tipoMascota == 'perr
 const colores_gatos = colores.filter((elem)=> elem.dataset.tipoMascota == 'gato')
 
 
-select_tipo_mascota.addEventListener('change', (event)=>{ editar_selects_por_tipo(event.target) })
-
-function editar_selects_por_tipo(opcion){
+select_tipo_mascota.addEventListener('change', (event)=>{
     razas[0].selected = true
     colores[0].selected = true
 
+    editar_selects_por_tipo(event.target) 
+})
+
+window.onload = editar_selects_por_tipo(select_tipo_mascota)
+
+function editar_selects_por_tipo(opcion){
     switch(opcion.value){
         case 'perro':{
             mostrar_esconder_opcs('mostrar', razas_perros, colores_perros)

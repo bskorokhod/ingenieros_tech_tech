@@ -30,50 +30,65 @@
         <div id="filtros" class="col-3 bg-verde rounded-3 p-4 align-self-start">
             <h2 class="text-light fw-semibold">Filtros</h2>
 
-            <form action="{{ url_for('encontrado') }}" method="POST">
+            <form action="{{ url_for('encontrado') }}" method="POST" id="formFiltros">
                 <label for="tipoMascota" class="form-label text-light fs-5">Tipo de animal</label>
                 <select id="tipoMascota" name="animal" class="form-select mb-4">
-                    <option value="" selected></option>
-                    <option value="perro">Perro</option>
-                    <option value="gato">Gato</option>
+                    {% for elem in ['', 'perro', 'gato'] %}
+                        <option value="{{ elem }}" {{ 'selected' if filtros['animal'] == elem }}>
+                            {{ elem.capitalize() }}
+                        </option>
+                    {% endfor %}
                 </select>
                 
                 
                 <label for="razaMascota" class="form-label text-light fs-5">Raza</label>
-                <select id="razaMascota" name="raza" class="form-select mb-4" disabled>
+                <select id="razaMascota" name="raza" class="form-select mb-4" {{ 'disabled' if not filtros['animal'] }}>
                     <option value="" selected></option>
                     {% for tipo, caracteristica in caracteristicas.items() %}
                         {% for raza in caracteristica['raza'] %}
-                    <option data-tipo-mascota="{{ tipo }}" value="{{ raza }}">{{ raza }}</option>
+                    <option data-tipo-mascota="{{ tipo }}" value="{{ raza }}"
+                            {{ 'selected' if filtros['raza'] == raza }}>
+                        {{ raza }}
+                    </option>
                         {% endfor %}
                     {% endfor %}
                 </select>
                 
 
                 <label for="colorPrincipalMascota" class="form-label text-light fs-5">Color principal</label>
-                <select id="colorPrincipalMascota" name="color" class="form-select mb-4" disabled>
+                <select id="colorPrincipalMascota" name="color" class="form-select mb-4" {{ 'disabled' if not filtros['animal'] }}>
                     <option value="" selected></option>
                     {% for tipo, caracteristica in caracteristicas.items() %}
                         {% for color in caracteristica['color'] %}
-                    <option data-tipo-mascota="{{ tipo }}" value="{{ color }}">{{ color }}</option>
+                    
+                        <option data-tipo-mascota="{{ tipo }}" value="{{ color }}"
+                            {{ 'selected' if filtros['color'] == color }} >
+                            {{ color }}
+                        </option>
+                    
                         {% endfor %}
                     {% endfor %}
                 </select>
 
                 <label for="sexoMascota" class="form-label text-light fs-5">Sexo</label>
                 <select id="sexoMascota" name="sexo" class="form-select mb-4">
-                    <option value="" selected></option>
-                    <option value="hembra">Hembra</option>
-                    <option valuea="macho">Macho</option>
+                    {% for elem in ['', 'hembra', 'macho'] %}
+                    <option value="{{ elem }}" {{ 'selected' if filtros['sexo'] == elem }} >
+                        {{ elem.capitalize() }}
+                    </option>
+                    {% endfor %}
                 </select>
 
                 <label for="edadMascota" class="form-label text-light fs-5">Edad</label>
                 <select id="edadMascota" name="edad" class="form-select mb-4">
-                    <option value="" selected></option>
-                    <option value="cachorro">Cachorro</option>
-                    <option value="joven">Joven</option>
-                    <option value="adulto">Adulto</option>
+                    {% for elem in ['', 'cachorro', 'joven', 'adulto'] %}
+                    <option value="{{ elem }}" {{ 'selected' if filtros['edad'] == elem }} >
+                        {{ elem.capitalize() }}
+                    </option>
+                    {% endfor %}
                 </select>
+
+                <input id="inputPagActual" name="pagina" type="number" value="{{ pagina_actual }}" class="d-none">
 
                 <div class="d-flex justify-content-end">
                     <button class="btn btn-light bg-gris text-gris fw-medium fs-5">Filtrar</button>
@@ -89,6 +104,13 @@
             <div id="mascotas" class="m-0 p-0">
                 <h2 class="text-verde display-5 fw-bold mb-3">Mascotas perdidas</h2>
 
+                {% if mascotas|length == 0 %}
+                    <div class="bg-light p-4 rounded-pill text-center">
+                        <h4 class="txt-alga fw-bold"><i class="me-3 fa-solid fa-paw"></i>No se encontraron mascotas!<i class="ms-3 fa-solid fa-paw"></i></h4>
+                        <p class="m-0">Podes probar usando otros filtros de búsqueda, ¡tal vez aparezca una!</p>
+                    </div>
+
+                {% else %}
                 <!-- TARJETAS MASCOTAS -->
                 <div id="cardsMascotas" class="row row-cols-3 mx-0 px-0 g-3">
 
@@ -103,7 +125,7 @@
                     {% endif %}
 
                     <!-- TARJETA MASCOTA {{ mascota['id'] }} -->
-                    <div class="col-4 tarjeta-mascota h-auto" data-nombre="{{ mascota['nombre_mascota'] }}" data-animal="{{ mascota['animal'] }}" data-coordx="{{ mascota['coordx'] }}" data-coordy="{{ mascota['coordy'] }}">
+                    <div class="col-4 tarjeta-mascota h-auto" data-nombre="{{ mascota['nombre_mascota'] }}" data-coordx="{{ mascota['coordx'] }}" data-coordy="{{ mascota['coordy'] }}">
                         <div class="bg-alga d-flex flex-column p-4 m-0 rounded-4 h-100 justify-content-between">
                             <div class="m-0 p-0">
                                 <h3 class="text-light fs-2 fw-medium m-0 lh-sm">{{ mascota['nombre_mascota'] }}</h3>
@@ -186,9 +208,29 @@
                     {% endfor %}
 
                 </div>
+
+                {% endif %}
             </div>
 
+            <div class="d-flex justify-content-center mt-3" id="pagination">
+                <button class="btn btn-success bg-alga rounded-circle text-center text-light border-0 mx-3 btn-pag"
+                        {% if not hay_pagina_previa %} disabled {% endif %} id="anterior">
+                    <i class="m-0 p-0 fa-solid fa-angle-left"></i>
+                </button>
+
+                <p id="pagActual" class="rounded-circle text-center bg-verde text-light pt-2 btn-pag">{{ pagina_actual }}</p>
+                
+                <button class="btn btn-success bg-alga rounded-circle text-center text-light border-0 mx-3 btn-pag"
+                        {% if not hay_pagina_siguiente %} disabled {% endif %} id="siguiente">
+                    <i class="m-0 p-0 fa-solid fa-angle-right"></i>
+                </button>
+            </div>
+
+
         </div>
+        
+        
+    
     </div>
 
 
@@ -207,6 +249,7 @@
     
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/script_filtrar_caract.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script_pagination.js')}}" ></script>
     <!--  js - leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

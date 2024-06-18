@@ -10,18 +10,18 @@
             <h2><i class="fa-solid fa-magnifying-glass-location fs-1"></i> Validar reencuentro</h2>
             <p>Bienvenido a la página de Validación de reportes. Acá, como administrador, tenés el poder de validar y aprobar reportes de reencuentro de mascotas. Tu papel es crucial para garantizar que cada mascota vuelva a su hogar, tendrás que verificar que el reporte sea verídico y consultar con los dueños de la mascota perdida la información necesaria para validar el reencuentro. Revisá con cuidado y asegurate de hacer lo correcto</p>
         </div>
-        <div class="mb-5 bg-white rounded-3 text-success-emphasis">
+        <div class="mb-5 rounded-3 bg-light text-success-emphasis">
             <!-- Si no hay reportes de reencuentro, se muestra un mensaje -->
             {% if reportes|length == 0 %}
-            <div class="bg-light p-4 text-center">
+            <div class="bg-light p-4 text-center rounded-top-3">
                 <h4 class="txt-alga fw-bold"><i class="me-3 fa-solid fa-paw"></i>No hay reportes pendientes para revisar<i class="ms-3 fa-solid fa-paw"></i></h4>
                 <p class="m-0">¡Esperemos que aparezca uno pronto!</p>
             </div>
             {% else %}
             <!-- Si hay reportes de reencuentro, se muestran para validarlos -->
             {% for id_reporte, reporte in reportes.items() %}
-                <h3 class="ms-5 pt-3">MASCOTA #{{ reporte['id_mascota'] }}</h3>
-                <div class="d-flex justify-content-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
+                <h3 class="ms-5 pt-3">REPORTE MASCOTA ENCONTRADA #{{ id_reporte }}</h3>
+                <div class="d-flex bg-light justify-content-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
                     <p class="fw-1 fs-5">Nombre: {{ reporte['nombre_mascota'] }}<br>
                     Ubicación de extravío: {{ reporte['direccion'] }}<br>
                     Fecha de extravío: {{ reporte['fecha_extravio'] }}</p>
@@ -54,7 +54,7 @@
 
             {% endif %}
             <!-- Paginación de reportes -->
-            <div class="d-flex justify-content-center mt-3 pt-3" id="pagination">
+            <div class="bg-light d-flex justify-content-center mt-3 bg-light rounded-bottom-3" id="pagination">
                 <form action="{{ url_for('admin_config') }}" method="POST">
                     <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
                     <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">
@@ -85,10 +85,10 @@
             <h2><i class="fa-solid fa-shield-heart fs-1"></i> Validar refugios</h2>
             <p>Este es el apartado de peticiones de refugios, tendrás que verificar que el lugar solicitado sea seguro, tengan papeles y demás validaciones, para que logre ser un refugio de la página y sobre todas las cosas, un hogar para aquellas mascotas sin dueño</p>
         </div>
-        <div class="mb-5 bg-white rounded-3 text-success-emphasis">
+        <div class="mb-5 bg-light rounded-3 text-success-emphasis">
             <!-- Si no hay peticiones de refugio, se muestra un mensaje -->
             {% if refugios|length == 0 %}
-            <div class="bg-light p-4 text-center">
+            <div class="bg-light bg-light p-4 text-center rounded-top-3">
                 <h4 class="txt-naranja fw-bold"><i class="me-3 fa-solid fa-house"></i>No hay pedidos de validación de refugios pendientes<i class="ms-3 fa-solid fa-house"></i></h4>
                 <p class="m-0">¡Esperemos que aparezca uno pronto!</p>
             </div>
@@ -96,7 +96,7 @@
             <!-- Si hay peticiones de refugio, se muestran para validarlos -->
             {% for refugio in refugios %}
                 <h3 class="mx-5 pt-3">REFUGIO #{{ refugio['id'] }}</h3>
-                <div class="d-flex justify-content-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
+                <div class="d-flex bg-light justify-content-between mx-5 {% if not loop.last %}border-bottom border-black{% endif %}">
                     <p class="fw-1 fs-5">Nombre: {{ refugio['nombre'] }}<br>
                     Ubicación: {{ refugio['direccion'] }}</p>
                     <p class="m-auto fw-1 fs-5">Teléfono: {{ refugio['telefono'] }}</p>
@@ -125,7 +125,7 @@
 
             {% endif %}
             <!-- Paginación de refugios -->
-            <div class="d-flex justify-content-center mt-3 pt-3">
+            <div class="d-flex justify-content-center bg-light pt-3 rounded-bottom-3">
                 <form action="{{ url_for('admin_config') }}" method="POST">
                     <input type="text" name="usuario" id="usuario" class="d-none" value="{{ usuario }}">
                     <input type="text" name="contraseña" id="contraseña" class="d-none" value="{{ contraseña }}">

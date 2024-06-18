@@ -43,8 +43,8 @@ def login_admin():
             response = conn.execute(text(f"SELECT * FROM admin WHERE usuario = '{user}' AND contrasena = '{password}'"))
             
             if response.rowcount > 0:
-                return jsonify({'code': 1})
-            return jsonify({'code': 0})
+                return jsonify({'code': 1}), 200
+            return jsonify({'code': 0}), 200
         
     except SQLAlchemyError as err:
         return jsonify(str(err.__cause__)), 500   
@@ -682,6 +682,7 @@ def refugios():
         query = f"DELETE FROM {TABLA_REFUGIOS} WHERE id = {id_del_refugio};"
 
     resultado, codigo = realizar_cambios(query, 200, engine)
+    return jsonify({"mensaje":resultado}), codigo
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=PUERTO_API)

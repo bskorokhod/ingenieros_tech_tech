@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %} Refugios - Patitas Perdidas {% endblock %}
 {% block styles %} 
-<link rel="stylesheet" href="{{ url_for('static', filename= 'css/styles_refugios.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/styles_refugios.css') }}"/> 
 <!-- css - leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -11,32 +11,50 @@
 {% set color_letras = "txt-verde" %}
 {% block content %}
     <div class="container">
-        <div class="bg-verde rounded-3">
-            <h1 class="text-light ps-3 pt-4">Refugios en nuestra red</h1>
-            <p class="text-light py-4 ps-3">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Asperiores veniam harum qui incidunt sit? Fugit itaque molestias, quia quam labore, cumque, pariatur maiores at sunt in corporis sapiente alias nostrum.</p>
+        <div class="bg-verde col-12 p-4 mb-4 rounded-3">
+            <h1 class="text-light display-5 fw-bold">Refugios en nuestra red</h1>
+            <p class="text-light lh-sm m-0 fs-5">Aquí encontrarás todos los refugios de nuestra red, con este mapa interactivo podrás buscarlos, y abajo hay un listado de estos, con su respectiva información para contactarlos en caso de encontrar una mascota en la calle que parezca no tener dueño y estar perdida</p>
         </div>
 
         <!-- Mapa -->
         <div id="map" class="my-4 rounded-3 bg-light"></div>
 
         <!-- Refugios -->
-        <div class="row gx-3 row-cols-4 px-4 py-5">
-            {% for refugio in refugios['refugios'] %}
-            <div class="col-3 tarjeta-refugio" data-nombre="{{ refugio['nombre'] }}" data-coordx="{{ refugio['coordx'] }}" data-coordy="{{ refugio['coordy'] }}">
+        <div class="row gx-3 row-cols-4 px-4 py-2">
+            {% for refugio in refugios %}
+            <div class="col-3 tarjeta-refugio h-auto my-3" data-nombre="{{ refugio['nombre'] }}" data-coordx="{{ refugio['coordx'] }}" data-coordy="{{ refugio['coordy'] }}">
                 <div class="position-relative">
-                    <span class="position-absolute top-0 start-0 translate-middle p-2 bg-white border border-light rounded-circle">
+                    <span class="position-absolute top-0 start-0 translate-middle p-2 bg-white rounded-circle">
                         <i class="txt-naranja fa-solid fa-shield-heart fs-3"></i>
                     </span>
                 </div>
-                <div class="bg-crema p-4 text-center rounded-3 mb-3">
+                <div class="bg-crema p-4 text-center rounded-3 mb-3 h-100">
                     <h2 class="mt-2">{{ refugio['nombre'] }}</h2>
                     <h5 class="m-0">Contacto:</h5>
                     <p class="m-0 text-black">Teléfono: {{ refugio['telefono'] }}</p>
                     <h5 class="m-0">Dirección:</h5>
-                    <p>{{ refugio['direccion'] }}</p>
+                    <p class="m-0">{{ refugio['direccion'] }}</p>
                 </div>
             </div>
             {% endfor %}
+        </div>
+        <!-- Paginación -->
+        <div class="d-flex justify-content-center mt-3" id="paginacion">
+            <form action="{{ url_for('refugios') }}" method="POST">
+                <button type="submit" name="pagina" value="{{ pagina - 1 }}" class="btn btn-success bg-alga rounded-circle text-center text-light border-0 mx-3 btn-pag"
+                    {% if not hay_pagina_anterior %} disabled {% endif %}>
+                    <i class="m-0 p-0 fa-solid fa-angle-left"></i>
+                </button>
+            </form>
+
+            <p class="rounded-circle text-center bg-verde text-light pt-2 btn-pag">{{ pagina }}</p>
+
+            <form action="{{ url_for('refugios') }}" method="POST">
+                <button type="submit" name="pagina" value="{{ pagina + 1 }}" class="btn btn-success bg-alga rounded-circle text-center text-light border-0 mx-3 btn-pag"
+                    {% if not hay_pagina_siguiente %} disabled {% endif %}>
+                    <i class="m-0 p-0 fa-solid fa-angle-right"></i>
+                </button>
+            </form>
         </div>
 
         <!-- Agregar refugio -->

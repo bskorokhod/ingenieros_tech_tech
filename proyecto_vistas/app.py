@@ -83,8 +83,8 @@ def admin_config():
             if tipo == "refugio":
 
                 id = request.form.get("id", "").lower()
-
-                if id == "": return internal_server_error(e=500)
+                
+                if id == "": return bad_request(e=400)
 
                 if accion == "aceptar":
                     response = requests.patch(HOST_API + ENDPOINT_API_REFUGIO,
@@ -95,16 +95,15 @@ def admin_config():
                                     json={"id": id})
                 
                 else:
-                    return internal_server_error(e=500)
+                    return bad_request(e=400)
 
             elif tipo == "reencuentro":
                 
                 if accion == "aceptar":
                     id_mascota = request.form.get("id_mascota", "").lower()
 
-                    print(id_mascota)
 
-                    if id_mascota == "": return internal_server_error(e=500)
+                    if id_mascota == "": return bad_request(e=400)
 
                     response = requests.put(HOST_API + ENDPOINT_API_REPORTES,
                                     json={"id_mascota": id_mascota})
@@ -112,26 +111,28 @@ def admin_config():
                 elif accion == "rechazar":
                     id_reporte = request.form.get("id_reporte", "").lower()
 
-                    if id_reporte == "": return internal_server_error(e=500)
+                    if id_reporte == "": return bad_request(e=400)
 
                     response = requests.patch(HOST_API + ENDPOINT_API_REPORTES,
                                     json={"id_reporte": id_reporte})
                 
                 else:
-                    return internal_server_error(e=500)
+                    return bad_request(e=400)
             
             else:
-                return internal_server_error(e=500)
+                return bad_request(e=400)
             
-            if not response.ok:
+            if response.status_code == 500:
                 return internal_server_error(e=response.status_code)
+            elif response.status_code == 400:
+                return bad_request(e=response.status_code)
 
         # En caso de enviarse un form desde login se carga la primera página
         num_pagina_refugios = request.form.get("pag_actual_refugios", "1")
         num_pagina_reportes = request.form.get("pag_actual_reportes", "1")
         
         if not num_pagina_refugios.isdigit() or not num_pagina_reportes.isdigit():
-            return internal_server_error(e=500)
+            return bad_request(e=400)
 
         num_pagina_refugios = int(num_pagina_refugios)
         num_pagina_reportes = int(num_pagina_reportes)
@@ -143,6 +144,8 @@ def admin_config():
         
         if response_refugios.status_code >= 500:
             return internal_server_error(e=response_refugios.status_code)
+        elif response_refugios.status_code == 400:
+            return bad_request(e=response.status_code)
 
         response_reportes = requests.get(HOST_API + ENDPOINT_API_REPORTES,
                                             params={"pag_reportes": num_pagina_reportes,
@@ -150,6 +153,8 @@ def admin_config():
 
         if response_reportes.status_code >= 500:
             return internal_server_error(e=response_reportes.status_code)
+        elif response_refugios.status_code == 400:
+            return bad_request(e=response.status_code)
 
         refugios = response_refugios.json()
         reportes = response_reportes.json()
@@ -193,7 +198,6 @@ def refugios():
     try:          
         pagina = request.form.get('pagina', 1, type=int)
         response = requests.get(HOST_API + ENDPOINT_API_REFUGIO, params={'pagina': pagina, 'elementos': LIMITE_REFUGIOS, 'aceptado': 'TRUE'})
-        
         response = response.json()
         
         hay_siguiente_pagina = response.get("hay_pag_siguiente", False)
@@ -222,7 +226,7 @@ def agregar_refugio():
         nuevo_refugio["direccion"] = request.form.get("direccion")
 
         if not es_refugio(nuevo_refugio):
-            return bad_request(e=400), 400
+            return bad_request(e=400)
         
         response = requests.post(HOST_API + ENDPOINT_API_REFUGIO, json = nuevo_refugio) 
         if response.status_code == 201: # verifico que no ocurrió un error
@@ -237,7 +241,7 @@ def agregar_refugio():
 def aceptado(formulario):
     # si el formulario es de reencuentro, se envía un POST a la API con el id de la mascota
     if request.method == "POST":
-        id_mascota = request.form.get("id_mascota")
+        id_mascota = request.form.get("id")
         data = {"id": id_mascota}
 
         response = requests.post(HOST_API + "/reportes_reencuentro", json=data)
@@ -271,8 +275,10 @@ def perdido():
         response = requests.post(HOST_API + '/mascotas_perdidas', json=datos_mascota_perdida) # HOST_API es una variable global
         if response.status_code == 201:
             return redirect(url_for("aceptado", formulario="mascota"))
-        else:
-            return internal_server_error(e=response.status_code) # Función que renderiza un template de error 500
+        elif response.status_code == 400:
+            return bad_request(e=response.status_code) # Función que renderiza un template de error 500
+        return internal_server_error(e=response.status_code)
+
 
     elif request.method == 'GET':
         response = requests.get(HOST_API + '/caracteristicas_mascotas')
