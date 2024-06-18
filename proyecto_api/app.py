@@ -12,7 +12,12 @@ app = Flask(__name__)
 
 @app.route('/caracteristicas_mascotas', methods=['GET'])
 def obtener_tabla_caracteristicas():
-    query =  "SELECT * FROM caracteristicas_mascotas" # Probar seleccionando sólo las columnas que no tienen id
+    query =  """SELECT * FROM caracteristicas_mascotas ORDER BY
+    CASE
+        WHEN valor = 'Otro / No se' THEN 1
+        ELSE 0
+    END,
+valor;"""
     try:
         with engine.connect() as conn:
             response = conn.execute(text(query))
@@ -23,7 +28,7 @@ def obtener_tabla_caracteristicas():
                 data[row.animal][row.caracteristica] = data[row.animal].get(row.caracteristica, []) + [row.valor]
             return jsonify(data), 200
     except SQLAlchemyError as err:
-        return jsonify(str(err.__cause__))
+        return jsonify(str(err.__cause__)), 500
     
     
 @app.route('/login_admin',  methods = ['GET'])
@@ -42,7 +47,7 @@ def login_admin():
             return jsonify({'code': 0})
         
     except SQLAlchemyError as err:
-        return jsonify(str(err.__cause__))    
+        return jsonify(str(err.__cause__)), 500   
     
 
 @app.route('/reportes_reencuentro', methods=['GET', 'POST', 'PATCH', 'PUT'])
@@ -484,17 +489,17 @@ def master():
         clave_unica_tabla = list(columnas_tabla.keys())[0]
 
         if clave_unica_tabla not in body:
-            return jsonify({"error": f"missing unique key: {clave_unica_tabla}"})
+            return jsonify({"mensaje": f"falta la clave única: {clave_unica_tabla}"})
 
         valor_clave_unica = body.get(clave_unica_tabla)
 
         if not es_id(valor_clave_unica):
-            return jsonify({"error": "value is not id"})
+            return jsonify({"mensaje": "el valor de la clave única no es un id"})
 
         id_en_tabla = realizar_query_validacion(f"SELECT {clave_unica_tabla} FROM {tabla} WHERE id = {valor_clave_unica};", engine)
 
         if id_en_tabla == -1 : 
-            return jsonify({"mensaje": "Ocurrió un error"}), 500
+            return jsonify({"mensaje": "ocurrió un error"}), 500
         
         if id_en_tabla == 0:
             return jsonify({"mensaje": "Bad request"}), 400
@@ -502,34 +507,45 @@ def master():
 
         query_modificacion = f"UPDATE `{tabla}` SET "
 
+        hay_cambios = False
+
         for clave, valor in body.items():
             if clave in columnas_tabla and clave != clave_unica_tabla:
 
                 funcion_auxiliar = columnas_tabla.get(clave)[0]
 
                 if funcion_auxiliar is es_varchar:
+
                     argumento_funcion = columnas_tabla.get(clave)[1]
+
                     if funcion_auxiliar(valor, argumento_funcion):
+
                         query_modificacion += f"`{clave}` = '{valor}', "
+
+                        hay_cambios = True
 
                     else:
 
-                        return jsonify({"error": f"{clave}'value ({valor}) does not fit the requierements"}), 400
+                        return jsonify({"mensaje": f"el valor de la clave {clave} ({valor}) no es válido"}), 400
                 else:
 
                     if funcion_auxiliar(valor):
 
-                        query_modificacion += f"{clave} = {valor}, "
+                        query_modificacion += f"`{clave}` = '{valor}', "
+
+                        hay_cambios = True
 
                     else:
 
-                        return jsonify({"error": f"{clave}'value ({valor}) does not fit the requierements"}), 400
-                    
-        query_modificacion = query_modificacion[:-2] + f" WHERE `{tabla}`.`{clave_unica_tabla}` = {valor_clave_unica};"
+                        return jsonify({"mensaje": f"el valor de la clave {clave} ({valor}) no es válido"}), 400
 
-        #query_modificacion = "UPDATE `animales_perdidos` SET `nombre_mascota` = 'Marco' WHERE `animales_perdidos`.`id` = 72;"
+        if not hay_cambios:
+            return jsonify({"mensaje": "Bad request"}), 400
+
+        query_modificacion = query_modificacion[:-2] + f" WHERE `{tabla}`.`{clave_unica_tabla}` = {valor_clave_unica};"
         
-        resultado, codigo  = realizar_cambios(query_modificacion, 200, engine)
+        resultado, codigo = realizar_cambios(query_modificacion, 200, engine)
+
         return jsonify({"mensaje": resultado}), codigo
 
 

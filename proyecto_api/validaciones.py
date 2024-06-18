@@ -73,7 +73,8 @@ def es_bool(valor) -> bool:
     """
     Verifica si `valor` es un booleano.
     """
-    return isinstance(valor, bool)
+    valor = str(valor)
+    return valor == "1" or valor == "0"
     
 # Validaciones de tipos en base de datos
 def es_animal_perdido(datos :dict) -> bool:
@@ -162,10 +163,10 @@ def es_caracteristica_mascota(datos :dict) -> bool:
         return False
     
 # Diccionario Endpoint master
-TABLAS = {TABLA_ADMIN: {"id": (es_id),
+TABLAS = {TABLA_ADMIN: {"id": (es_id, 0),
                         "usuario": (es_varchar, 10),
                         "contrasena": (es_varchar, 50)},
-          TABLA_ANIMALES_PERDIDOS: {"id": (es_id),
+          TABLA_ANIMALES_PERDIDOS: {"id": (es_id, 0),
                                     "nombre_mascota": (es_varchar, 20),
                                     "animal": (es_varchar, 5),
                                     "raza": (es_varchar, 30),
@@ -173,24 +174,24 @@ TABLAS = {TABLA_ADMIN: {"id": (es_id),
                                     "color": (es_varchar, 8),
                                     "edad": (es_varchar, 9),
                                     "direccion": (es_varchar, 100),
-                                    "coordx": (es_float),
-                                    "coordy": (es_float),
-                                    "fecha_extravio": (es_fecha),
-                                    "telefono_contacto": (es_telefono),
+                                    "coordx": (es_float, 0),
+                                    "coordy": (es_float, 0),
+                                    "fecha_extravio": (es_fecha, 0),
+                                    "telefono_contacto": (es_telefono, 0),
                                     "nombre_contacto": (es_varchar, 64),
                                     "info adicional": (es_varchar, 280),
-                                    "encontrado": (es_bool)},
-          TABLA_CARACTERISTICAS_MASCOTAS: {"id": (es_id),
+                                    "encontrado": (es_bool, 0)},
+          TABLA_CARACTERISTICAS_MASCOTAS: {"id": (es_id, 0),
                                            "animal": (es_varchar, 5),
                                            "caracteristica": (es_varchar, 5),
                                            "valor": (es_varchar, 30)},
-          TABLA_REFUGIOS: {"id": (es_id),
+          TABLA_REFUGIOS: {"id": (es_id, 0),
                            "nombre": (es_varchar, 64),
                            "direccion": (es_varchar, 100),
-                           "coordx": (es_float),
-                           "coordy": (es_float),
-                           "telefono": (es_telefono),
-                           "aceptado": (es_bool)},
-          TABLA_REPORTES_REENCUENTRO: {"id_reporte": (es_id),
-                                       "id_mascota": (es_id),
-                                       "fue_procesado": (es_bool)}}
+                           "coordx": (es_float, 0),
+                           "coordy": (es_float, 0),
+                           "telefono": (es_telefono, 0),
+                           "aceptado": (es_bool, 0)},
+          TABLA_REPORTES_REENCUENTRO: {"id_reporte": (es_id, 0),
+                                       "id_mascota": (es_id, 0),
+                                       "fue_procesado": (es_bool, 0)}}

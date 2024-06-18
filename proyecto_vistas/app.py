@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 import requests
-from config_app import PUERTO_APP, HOST_API, ENDPOINT_API_REFUGIO, ENDPOINT_API_REPORTES, ENDPOINT_API_LOGIN, ENDPOINT_API_CARACTERISTICAS, ENDPOINT_API_PERDIDAS
+from config_app import PUERTO_APP, HOST_API, ENDPOINT_API_REFUGIO, ENDPOINT_API_REPORTES, ENDPOINT_API_LOGIN, ENDPOINT_API_CARACTERISTICAS, ENDPOINT_API_PERDIDAS, LIMITE_MASCOTAS, LIMITE_REFUGIOS, LIMITE_REPORTES_REENCUENTRO, LIMITE_REPORTES_REFUGIOS
 from validaciones import es_refugio
 
 app = Flask(__name__)
@@ -13,7 +13,7 @@ def home():
 def login():
     return render_template('login.html')
 
-@app.route('/admin', methods=['GET', 'POST', 'PATCH', 'PUT', 'DELETE'])
+@app.route('/admin', methods=['GET', 'POST'])
 def admin_config():
     """
     FLUJO GENERAL DEL ENDPOINT `/admin`
@@ -75,7 +75,7 @@ def admin_config():
 
     if sesion.get("code") == 1:
 
-        if request.method in ('PATCH', 'PUT', 'DELETE'):
+        if "tipo" in request.form:
 
             tipo = request.form.get("tipo", "").lower() # "refugio" / "reencuentro"
             accion = request.form.get("accion", "").lower() # "aceptar" / "rechazar"
@@ -87,11 +87,11 @@ def admin_config():
                 if id == "": return internal_server_error(e=500)
 
                 if accion == "aceptar":
-                    requests.patch(HOST_API + ENDPOINT_API_REFUGIO,
+                    response = requests.patch(HOST_API + ENDPOINT_API_REFUGIO,
                                     json={"id": id})
 
                 elif accion == "rechazar":
-                    requests.delete(HOST_API + ENDPOINT_API_REFUGIO,
+                    response = requests.delete(HOST_API + ENDPOINT_API_REFUGIO,
                                     json={"id": id})
                 
                 else:
@@ -102,54 +102,55 @@ def admin_config():
                 if accion == "aceptar":
                     id_mascota = request.form.get("id_mascota", "").lower()
 
+                    print(id_mascota)
+
                     if id_mascota == "": return internal_server_error(e=500)
 
-                    requests.put(HOST_API + ENDPOINT_API_REPORTES,
-                                    json={"id mascota": id_mascota})
+                    response = requests.put(HOST_API + ENDPOINT_API_REPORTES,
+                                    json={"id_mascota": id_mascota})
 
                 elif accion == "rechazar":
                     id_reporte = request.form.get("id_reporte", "").lower()
 
                     if id_reporte == "": return internal_server_error(e=500)
 
-                    requests.patch(HOST_API + ENDPOINT_API_REPORTES,
-                                    json={"id reporte": id_reporte})
+                    response = requests.patch(HOST_API + ENDPOINT_API_REPORTES,
+                                    json={"id_reporte": id_reporte})
                 
                 else:
                     return internal_server_error(e=500)
             
             else:
                 return internal_server_error(e=500)
-
-        # Esto se ejecuta siempre que la sesión sea válida, independientemente del método
+            
+            if not response.ok:
+                return internal_server_error(e=response.status_code)
 
         # En caso de enviarse un form desde login se carga la primera página
-        num_pagina_refugios = request.form.get("pag_actual_refugios", 1)
-        num_pagina_reportes = request.form.get("pag_actual_reportes", 1)
+        num_pagina_refugios = request.form.get("pag_actual_refugios", "1")
+        num_pagina_reportes = request.form.get("pag_actual_reportes", "1")
         
         if not num_pagina_refugios.isdigit() or not num_pagina_reportes.isdigit():
             return internal_server_error(e=500)
 
+        num_pagina_refugios = int(num_pagina_refugios)
+        num_pagina_reportes = int(num_pagina_reportes)
 
         response_refugios = requests.get(HOST_API + ENDPOINT_API_REFUGIO,
-                                            params={"pag_refugios": int(num_pagina_refugios),
-                                                    "limite_refugios": LIMITE_REPORTES_REFUGIOS,
-                                                    "aceptado": "false"})
+                                            params={"pagina": num_pagina_refugios,
+                                                    "elementos": LIMITE_REPORTES_REFUGIOS,
+                                                    "aceptado": "FALSE"})
         
         if response_refugios.status_code >= 500:
             return internal_server_error(e=response_refugios.status_code)
 
-
         response_reportes = requests.get(HOST_API + ENDPOINT_API_REPORTES,
-                                            params={"pag_reportes": int(num_pagina_reportes),
-                                                    "limite_reportes": LIMITE_REPORTES_REENCUENTRO,
-                                                    "fue_procesado": False})
+                                            params={"pag_reportes": num_pagina_reportes,
+                                                    "limite_reportes": LIMITE_REPORTES_REENCUENTRO})
 
         if response_reportes.status_code >= 500:
             return internal_server_error(e=response_reportes.status_code)
 
-        # PENDIENTE: CONSENSUAR CÓMO SE RECIBE SI HAY PÁGINA SIGUIENTE
-        #            VERIFICAR QUE LOS JSON CUMPLAN CON EL FORMATO ESPERADO
         refugios = response_refugios.json()
         reportes = response_reportes.json()
 
@@ -183,7 +184,7 @@ def admin_config():
                                 pag_actual_refugios = num_pagina_refugios,
                                 pag_actual_reportes = num_pagina_reportes)
 
-    return redirect(url_for("login"))
+    return redirect(url_for('login'))
 
 
 @app.route('/refugios', methods=["GET",'POST'])
